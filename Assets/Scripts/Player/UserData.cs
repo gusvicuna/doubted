@@ -2,11 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerData
+public class UserData
 {
     #region Public Attributes
 
     public string username;
+    public string[] friends;
+    public string[] games;
+    public string[] gamesInvited;
+    public string[] friendsInvited;
 
     #endregion
 
@@ -17,8 +21,8 @@ public class PlayerData
         return JsonUtility.ToJson(this);
     }
 
-    public static PlayerData Parse(string json) {
-        return JsonUtility.FromJson<PlayerData>(json);
+    public static UserData Parse(string json) {
+        return JsonUtility.FromJson<UserData>(json);
     }
 
     #endregion

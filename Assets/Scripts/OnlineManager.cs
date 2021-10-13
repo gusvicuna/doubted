@@ -38,7 +38,9 @@ public class OnlineManager : MonoBehaviour
 
     #region Public Methods
 
-    public IEnumerator GetPlayer(string id, System.Action<PlayerData> callback = null) {
+
+    //GetPlayerID
+    public IEnumerator GetPlayer(string id, System.Action<UserData> callback = null) {
         using (UnityWebRequest request = UnityWebRequest.Get(playersEndpoint + id)) {
             yield return request.SendWebRequest();
 
@@ -50,12 +52,13 @@ public class OnlineManager : MonoBehaviour
             }
             else {
                 if (callback != null) {
-                    callback.Invoke(PlayerData.Parse(request.downloadHandler.text));
+                    callback.Invoke(UserData.Parse(request.downloadHandler.text));
                 }
             }
         }
     }
 
+    //PostPlayerID
     public IEnumerator PostPlayer(string profile, System.Action<bool> callback = null) {
         using (UnityWebRequest request = new UnityWebRequest(playersEndpoint, UnityWebRequest.kHttpVerbPOST)) {
             request.SetRequestHeader("Content-Type", "application/json");
@@ -77,6 +80,18 @@ public class OnlineManager : MonoBehaviour
             }
         }
     }
+
+    //GetPlayerGames
+
+    //GetPlayerGameInvitations
+
+    //GetPlayerFriendInvitations
+
+    //GetPlayerFriends
+
+    //GetJoinGame
+
+    //GetAddFriend
 
     #endregion
 }

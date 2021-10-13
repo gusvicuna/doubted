@@ -11,9 +11,15 @@ public class LoginManager : MonoBehaviour
     public GameObject mainMenuPanel;
     public GameObject miniMenuPanel;
 
+    public MenuManager menuManager;
+    public OnlineManager onlineManager;
+
     // Start is called before the first frame update
     void Start()
     {
+        menuManager = MenuManager.singleton;
+        onlineManager = OnlineManager.singleton;
+
         feedbackText.text = "";
 
         if (PlayerPrefs.GetString("username") != null) {
@@ -34,7 +40,10 @@ public class LoginManager : MonoBehaviour
 
     public void LogIn() {
 
-        //TODO: Load user...
+        // UserData loadedUser;
+        // StartCoroutine(onlineManager.GetPlayer(menuManager.userData.username, result => {
+
+        // }));
 
         mainMenuPanel.SetActive(true);
         miniMenuPanel.SetActive(true);

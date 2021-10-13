@@ -10,9 +10,15 @@ public class FriendsPanel : MonoBehaviour
     public InputField usernameInputField;
     public Text feedbackText;
 
+    public GameObject friendPanelPrefab;
+
     #endregion
 
     private void Start() {
         feedbackText.text = "";
+    }
+
+    public void LoadFriends() {
+
     }
 }
