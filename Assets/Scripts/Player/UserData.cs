@@ -6,6 +6,7 @@ public class UserData
 {
     #region Public Attributes
 
+    public int id;
     public string username;
     public string[] friends;
     public string[] games;

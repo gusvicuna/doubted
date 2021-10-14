@@ -15,7 +15,7 @@ public class OnlineManager : MonoBehaviour
 
     #region Routes
 
-    private const string playersEndpoint = "";
+    private const string rootPath = "https://pdsuandes.herokuapp.com/";
 
     #endregion
 
@@ -39,9 +39,9 @@ public class OnlineManager : MonoBehaviour
     #region Public Methods
 
 
-    //GetPlayerID
-    public IEnumerator GetPlayer(string id, System.Action<UserData> callback = null) {
-        using (UnityWebRequest request = UnityWebRequest.Get(playersEndpoint + id)) {
+    //GetPlayer(username)
+    public IEnumerator GetPlayer(string username, System.Action<UserData> callback = null) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/login" + "?username=" + username)) {
             yield return request.SendWebRequest();
 
             if (request.result == UnityWebRequest.Result.ProtocolError) {
@@ -58,9 +58,9 @@ public class OnlineManager : MonoBehaviour
         }
     }
 
-    //PostPlayerID
+    //PostPlayer(username)
     public IEnumerator PostPlayer(string profile, System.Action<bool> callback = null) {
-        using (UnityWebRequest request = new UnityWebRequest(playersEndpoint, UnityWebRequest.kHttpVerbPOST)) {
+        using (UnityWebRequest request = new UnityWebRequest(rootPath, UnityWebRequest.kHttpVerbPOST)) {
             request.SetRequestHeader("Content-Type", "application/json");
             byte[] bodyRaw = Encoding.UTF8.GetBytes(profile);
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -81,17 +81,30 @@ public class OnlineManager : MonoBehaviour
         }
     }
 
-    //GetPlayerGames
+    //GetPlayerGames(id) 
 
-    //GetPlayerGameInvitations
+    //GetPlayerGameInvitations(username)
 
-    //GetPlayerFriendInvitations
+    //GetPlayerFriendInvitations(username)
 
-    //GetPlayerFriends
+    //GetPlayerFriends(username)
 
-    //GetJoinGame
 
-    //GetAddFriend
+    //PostCreateGame(id,players,sala)
+
+
+    //PostInviteFriend(sala,target_id)
+
+    //UpdateInviteFriend(sala,id)
+
+    //DeleteInviteFriend(sala,id)
+
+
+    //PostAddFriend(id,target_id)
+
+    //UpdateAddFriend(id,target_id,status)
+
+    //DeleteAddFriend(id,target_id)
 
     #endregion
 }
