@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
+using SimpleJSON;
 
 public class OnlineManager : MonoBehaviour
 {
@@ -38,10 +39,46 @@ public class OnlineManager : MonoBehaviour
 
     #region Public Methods
 
-
     //GetPlayer(username)
-    public IEnumerator GetPlayer(string username, System.Action<UserData> callback = null) {
+    public IEnumerator GetPlayerId(string username, System.Action<JSONNode> callback = null) {
         using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/login" + "?username=" + username)) {
+            yield return request.SendWebRequest();
+            if (request.result == UnityWebRequest.Result.ProtocolError) {
+                Debug.Log(request.error);
+                if (callback != null) {
+                    callback.Invoke(null);
+                }
+            }
+            else {
+                if (callback != null) {
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+            }
+        }
+    }
+
+    //PostPlayer(username)
+    public IEnumerator Signup(string username, System.Action<JSONNode> callback = null) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/new_user" + "?username=" + username)) {
+            yield return request.SendWebRequest();
+            if (request.result == UnityWebRequest.Result.ProtocolError) {
+                Debug.Log(request.error);
+                if (callback != null) {
+                    callback.Invoke(null);
+                }
+            }
+            else {
+                if (callback != null) {
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+            }
+        }
+    }
+
+
+    //GetPlayerGames(id)
+    public IEnumerator GetPlayerGames(string id, System.Action<JSONNode> callback = null) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/games" + "?my_id=" + id)) {
             yield return request.SendWebRequest();
 
             if (request.result == UnityWebRequest.Result.ProtocolError) {
@@ -52,59 +89,100 @@ public class OnlineManager : MonoBehaviour
             }
             else {
                 if (callback != null) {
-                    callback.Invoke(UserData.Parse(request.downloadHandler.text));
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+                else {
+                    Debug.Log("error");
                 }
             }
         }
     }
 
-    //PostPlayer(username)
-    public IEnumerator PostPlayer(string profile, System.Action<bool> callback = null) {
-        using (UnityWebRequest request = new UnityWebRequest(rootPath, UnityWebRequest.kHttpVerbPOST)) {
-            request.SetRequestHeader("Content-Type", "application/json");
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(profile);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = new DownloadHandlerBuffer();
+    //GetPlayerFriends(username) = List<username>
+    public IEnumerator GetPlayerFriends(string id, System.Action<JSONNode> callback = null) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/friends" + "?current_id=" + id)) {
             yield return request.SendWebRequest();
 
             if (request.result == UnityWebRequest.Result.ProtocolError) {
                 Debug.Log(request.error);
                 if (callback != null) {
-                    callback.Invoke(false);
+                    callback.Invoke(null);
                 }
             }
             else {
                 if (callback != null) {
-                    callback.Invoke(request.downloadHandler.text != "{}");
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+                else {
+                    Debug.Log("error");
                 }
             }
         }
     }
 
-    //GetPlayerGames(id) 
-
-    //GetPlayerGameInvitations(username)
-
-    //GetPlayerFriendInvitations(username)
-
-    //GetPlayerFriends(username)
-
 
     //PostCreateGame(id,players,sala)
+    public IEnumerator NewGame(string id, string players, string sala, System.Action<JSONNode> callback = null) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/new_game" + "?current_id=" + id + "&players=" + players + "&sala=" + sala)) {
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.ProtocolError) {
+                Debug.Log(request.error);
+                if (callback != null) {
+                    callback.Invoke(null);
+                }
+            }
+            else {
+                if (callback != null) {
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+                else {
+                    Debug.Log("error");
+                }
+            }
+        }
+    }
+
+    //PostJoinGame()
+    public IEnumerator JoinGame(string id, string sala, System.Action<JSONNode> callback = null) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/join" + "?sala=" + sala + "&current_id=" + id)) {
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.ProtocolError) {
+                Debug.Log(request.error);
+                if (callback != null) {
+                    callback.Invoke(null);
+                }
+            }
+            else {
+                if (callback != null) {
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+                else {
+                    Debug.Log("error");
+                }
+            }
+        }
+    }
 
 
-    //PostInviteFriend(sala,target_id)
+    //GetPlayerGameInvitations(id) => List<game_id>
 
-    //UpdateInviteFriend(sala,id)
-
-    //DeleteInviteFriend(sala,id)
+    //GetPlayerFriendInvitations(id)  => List<username>
 
 
-    //PostAddFriend(id,target_id)
+    //InviteFriendToGame(sala, target_id)
 
-    //UpdateAddFriend(id,target_id,status)
+    //AcceptInviteFriendToGame(id, sala)
 
-    //DeleteAddFriend(id,target_id)
+    //DeleteInviteFriend(id, sala)
+
+
+    //PostAddFriend(id, target_id)
+
+    //UpdateAddFriend(id, target_id, status)
+
+    //DeleteAddFriend(id, target_id)
 
     #endregion
 }

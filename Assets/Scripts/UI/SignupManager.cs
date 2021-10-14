@@ -7,14 +7,21 @@ public class SignupManager : MonoBehaviour
 {
     public InputField usernameInputField;
     public Text feedbackText;
+
+    private OnlineManager onlineManager;
     // Start is called before the first frame update
     void Start()
     {
+        onlineManager = OnlineManager.singleton;
         feedbackText.text = "";
     }
 
     public void CreateUser() {
 
-        //TODO: Save User...
+        StartCoroutine(onlineManager.Signup(usernameInputField.text.ToString(), result => {
+            if (result != null) {
+                feedbackText.text = "User created.";
+            }
+        }));
     }
 }

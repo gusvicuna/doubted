@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CreateGameManager : MonoBehaviour
+public class CreateGame : MonoBehaviour
 {
     #region Public Attributes
 
@@ -13,10 +13,16 @@ public class CreateGameManager : MonoBehaviour
 
     public Text feedbackText;
 
+    public MenuManager menuManager;
+    public OnlineManager onlineManager;
+
     #endregion
     // Start is called before the first frame update
     void Start()
     {
+        onlineManager = OnlineManager.singleton;
+        menuManager = MenuManager.singleton;
+
         feedbackText.text = "";
     }
 
@@ -26,8 +32,12 @@ public class CreateGameManager : MonoBehaviour
         
     }
 
-    public void CreateGame() {
+    public void NewGame() {
 
-        //TODO: create game...
+        StartCoroutine(onlineManager.NewGame(menuManager.userData.id.ToString(), numberPlayersDropdown.captionText.text, nameInputField.text, result => {
+            if (result != null) {
+                feedbackText.text = "Game created.";
+            }
+        }));
     }
 }

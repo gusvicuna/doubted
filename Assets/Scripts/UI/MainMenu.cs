@@ -8,20 +8,17 @@ public class MainMenu : MonoBehaviour
     #region Public Attributes
 
     public Text usernameText;
+    public GameObject activeGamePrefab;
+    public GameObject activeGamesList;
 
     #endregion
     public void OnEnable() {
         usernameText.text = PlayerPrefs.GetString("username");
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public void AddGame(GameData gameData) {
+        GameObject activeGame = Instantiate(activeGamePrefab, activeGamesList.transform);
+        activeGame.GetComponent<ActiveGame>().salaText.text = gameData.sala.ToString();
+        activeGame.GetComponent<ActiveGame>().playersText.text = gameData.players.ToString();
     }
 }

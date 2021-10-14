@@ -40,18 +40,19 @@ public class LoginManager : MonoBehaviour
 
     public void LogIn() {
 
-        UserData loadedUser;
-        StartCoroutine(onlineManager.GetPlayer(PlayerPrefs.GetString("username"), result => {
+        StartCoroutine(onlineManager.GetPlayerId(PlayerPrefs.GetString("username"), result => {
             if (result != null) {
-                menuManager.userData.id = result.id;
-
-                mainMenuPanel.SetActive(true);
-                miniMenuPanel.SetActive(true);
-                this.gameObject.SetActive(false);
+                menuManager.userData.id = result["user_id"];
+                menuManager.updating = true;
+                menuManager.DoSomething();
+                ChangePanels();
             }
         }));
+    }
 
-        
-
+    private void ChangePanels() {
+        mainMenuPanel.SetActive(true);
+        miniMenuPanel.SetActive(true);
+        this.gameObject.SetActive(false);
     }
 }

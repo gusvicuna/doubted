@@ -8,8 +8,8 @@ public class UserData
 
     public int id;
     public string username;
-    public string[] friends;
-    public string[] games;
+    public List<string> friends;
+    public List<GameData> games = new List<GameData>();
     public string[] gamesInvited;
     public string[] friendsInvited;
 

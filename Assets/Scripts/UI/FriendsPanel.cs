@@ -9,16 +9,42 @@ public class FriendsPanel : MonoBehaviour
 
     public InputField usernameInputField;
     public Text feedbackText;
+    public Text friendSearchText;
+    public Button addFriendButton;
 
     public GameObject friendPanelPrefab;
+    public GameObject friendsList;
 
+    private MenuManager menuManager;
+    private OnlineManager onlineManager;
     #endregion
 
     private void Start() {
+        menuManager = MenuManager.singleton;
+        onlineManager = OnlineManager.singleton;
+
         feedbackText.text = "";
+        friendSearchText.text = "";
+        addFriendButton.gameObject.SetActive(false);
     }
 
-    public void LoadFriends() {
+    public void AddFriend(string friendUsername) {
+        GameObject friendPanel = Instantiate(friendPanelPrefab, friendsList.transform);
+        friendPanel.GetComponentInChildren<Text>().text = friendUsername; 
+    }
 
+    public void SearchFriend() {
+        StartCoroutine(onlineManager.GetPlayerId(usernameInputField.text, result => {
+            if (result != null) {
+                feedbackText.text = "";
+                friendSearchText.text = usernameInputField.text;
+                addFriendButton.gameObject.SetActive(true);
+            }
+            else {
+                friendSearchText.text = "";
+                feedbackText.text = "User not found.";
+                addFriendButton.gameObject.SetActive(false);
+            }
+        }));
     }
 }
