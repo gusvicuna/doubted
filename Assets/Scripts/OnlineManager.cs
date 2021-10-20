@@ -22,16 +22,10 @@ public class OnlineManager : MonoBehaviour
 
 
     #region MonoBehaviour Callbacks
-    // Start is called before the first frame update
+
     void Start()
     {
         if (singleton == null) singleton = this;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     #endregion

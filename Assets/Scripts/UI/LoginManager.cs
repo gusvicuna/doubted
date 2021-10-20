@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class LoginManager : MonoBehaviour
 {
+    #region Public Attributes
+
     public InputField loginUsername;
     public Text feedbackText;
 
@@ -14,7 +16,11 @@ public class LoginManager : MonoBehaviour
     public MenuManager menuManager;
     public OnlineManager onlineManager;
 
-    // Start is called before the first frame update
+    #endregion
+
+
+    #region MonoBehaviour Callbacks
+
     void Start()
     {
         menuManager = MenuManager.singleton;
@@ -28,15 +34,9 @@ public class LoginManager : MonoBehaviour
         loginUsername.onValueChanged.AddListener(delegate { SaveUsername(); });
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    #endregion
 
-    public void SaveUsername() {
-        PlayerPrefs.SetString("username", loginUsername.text.ToString());
-    }
+    #region Public Methods
 
     public void LogIn() {
 
@@ -50,9 +50,20 @@ public class LoginManager : MonoBehaviour
         }));
     }
 
+    #endregion
+
+
+    #region Private Methods
+
     private void ChangePanels() {
         mainMenuPanel.SetActive(true);
         miniMenuPanel.SetActive(true);
         this.gameObject.SetActive(false);
     }
+
+    private void SaveUsername() {
+        PlayerPrefs.SetString("username", loginUsername.text.ToString());
+    }
+
+    #endregion
 }

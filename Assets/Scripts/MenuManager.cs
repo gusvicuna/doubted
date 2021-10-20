@@ -4,35 +4,49 @@ using UnityEngine;
 
 public class MenuManager : MonoBehaviour
 {
-    public UserData userData;
+    #region Public Attributes
+
+    //Singleton
     public static MenuManager singleton;
-    
+
+    public UserData userData;
+
     public MainMenu mainMenu;
     public FriendsPanel friendsPanel;
     public bool updating = false;
 
+    #endregion
+
+
+    #region Private Attributes
+
     private OnlineManager onlineManager;
 
-    // Start is called before the first frame update
+    #endregion
+
+
+    #region MonoBehaviour Callbacks
+
     void Start()
     {
-        userData = new UserData();
+        //Singleton
         if (singleton == null) singleton = this;
+
+        userData = new UserData();
+        
         onlineManager = OnlineManager.singleton;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    #endregion
 
-    }
 
+    #region Public Methods
     public void DoSomething() {
         StartCoroutine(UpdateData());
     }
 
     public IEnumerator UpdateData() {
-        while (true) {
+        while (updating) {
             UpdateActiveGames();
             // TODO: UpdateFriends()
             yield return new WaitForSeconds(5);
@@ -63,4 +77,6 @@ public class MenuManager : MonoBehaviour
             }
         }));
     }
+
+    #endregion
 }
