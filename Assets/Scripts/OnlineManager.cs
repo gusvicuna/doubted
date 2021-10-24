@@ -160,23 +160,162 @@ public class OnlineManager : MonoBehaviour
     }
 
 
-    //GetPlayerGameInvitations(id) => List<game_id>
+    //GetGameInvitations(id) => List<game_id>
+    public IEnumerator GetGameNotifications(string id, System.Action<JSONNode> callback = null) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/get_game_invitations" + "?current_id=" + id)) {
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.ProtocolError) {
+                Debug.Log(request.error);
+                if (callback != null) {
+                    callback.Invoke(null);
+                }
+            }
+            else {
+                if (callback != null) {
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+                else {
+                    Debug.Log("error");
+                }
+            }
+        }
+    }
 
     //GetPlayerFriendInvitations(id)  => List<username>
+    public IEnumerator GetFriendNotifications(string id, System.Action<JSONNode> callback = null) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/get_friends_invitations" + "?current_id=" + id)) {
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.ProtocolError) {
+                Debug.Log(request.error);
+                if (callback != null) {
+                    callback.Invoke(null);
+                }
+            }
+            else {
+                if (callback != null) {
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+                else {
+                    Debug.Log("error");
+                }
+            }
+        }
+    }
 
 
-    //InviteFriendToGame(sala, target_id)
+    //InviteToGame(sala, target_id)
 
-    //AcceptInviteFriendToGame(id, sala)
+    //AcceptInviteToGame(id, sala)
+    public IEnumerator AcceptGame(string id, string sala, System.Action<JSONNode> callback = null) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/accept_game" + "?current_id=" + id + "?sala=" + sala)) {
+            yield return request.SendWebRequest();
 
-    //DeleteInviteFriend(id, sala)
+            if (request.result == UnityWebRequest.Result.ProtocolError) {
+                Debug.Log(request.error);
+                if (callback != null) {
+                    callback.Invoke(null);
+                }
+            }
+            else {
+                if (callback != null) {
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+                else {
+                    Debug.Log("error");
+                }
+            }
+        }
+    }
 
+    //DeleteInviteToGame(id, sala)
+    public IEnumerator DeclineGame(string id, string sala, System.Action<JSONNode> callback = null) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/decline_game" + "?current_id=" + id + "?sala=" + sala)) {
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.ProtocolError) {
+                Debug.Log(request.error);
+                if (callback != null) {
+                    callback.Invoke(null);
+                }
+            }
+            else {
+                if (callback != null) {
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+                else {
+                    Debug.Log("error");
+                }
+            }
+        }
+    }
 
     //PostAddFriend(id, target_id)
+    public IEnumerator RequestFriend(string id, string target_id, System.Action<JSONNode> callback = null) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/add_friend" + "?current_id=" + id + "?target_id=" + target_id)) {
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.ProtocolError) {
+                Debug.Log(request.error);
+                if (callback != null) {
+                    callback.Invoke(null);
+                }
+            }
+            else {
+                if (callback != null) {
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+                else {
+                    Debug.Log("error");
+                }
+            }
+        }
+    }
 
     //UpdateAddFriend(id, target_id, status)
+    public IEnumerator AcceptFriend(string id, string target_id, System.Action<JSONNode> callback = null) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/accept_friend_request" + "?current_id=" + id + "?target_id=" + target_id)) {
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.ProtocolError) {
+                Debug.Log(request.error);
+                if (callback != null) {
+                    callback.Invoke(null);
+                }
+            }
+            else {
+                if (callback != null) {
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+                else {
+                    Debug.Log("error");
+                }
+            }
+        }
+    }
 
     //DeleteAddFriend(id, target_id)
+    public IEnumerator DeclineFriend(string id, string target_id, System.Action<JSONNode> callback = null) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/decline_friend_request" + "?current_id=" + id + "?target_id=" + target_id)) {
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.ProtocolError) {
+                Debug.Log(request.error);
+                if (callback != null) {
+                    callback.Invoke(null);
+                }
+            }
+            else {
+                if (callback != null) {
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+                else {
+                    Debug.Log("error");
+                }
+            }
+        }
+    }
 
     #endregion
 }

@@ -13,6 +13,7 @@ public class MenuManager : MonoBehaviour
 
     public MainMenu mainMenu;
     public FriendsPanel friendsPanel;
+    public Notifications notifications;
     public bool updating = false;
 
     #endregion
@@ -41,6 +42,8 @@ public class MenuManager : MonoBehaviour
 
 
     #region Public Methods
+
+    //Update data
     public void DoSomething() {
         StartCoroutine(UpdateData());
     }
@@ -48,7 +51,8 @@ public class MenuManager : MonoBehaviour
     public IEnumerator UpdateData() {
         while (updating) {
             UpdateActiveGames();
-            // TODO: UpdateFriends()
+            // TODO: UpdateFriends();
+            // TODO: UpdateFriendNotifications();
             yield return new WaitForSeconds(5);
         }
     }
@@ -66,17 +70,74 @@ public class MenuManager : MonoBehaviour
             }
         }));
     }
-
     public void UpdateFriends() {
         StartCoroutine(onlineManager.GetPlayerFriends(userData.id.ToString(), result => {
             foreach (KeyValuePair<string, SimpleJSON.JSONNode> entry in result) {
                 if (!userData.friends.Exists(x => x == entry.Value)) {
                     userData.friends.Add(entry.Value);
-                    friendsPanel.AddFriend(entry.Value);
+                    friendsPanel.ShowFriend(entry.Value);
                 }
             }
         }));
     }
+    public void UpdateFriendNotifications() {
+        StartCoroutine(onlineManager.GetFriendNotifications(userData.id.ToString(), result => {
+            foreach (KeyValuePair<string, SimpleJSON.JSONNode> entry in result) {
+                if (!userData.friendsInvited.Exists(x => x == entry.Value)) {
+                    userData.friendsInvited.Add(entry.Value);
+                }
+            }
+        }));
+    }
+
+    //Friend Post and Update
+    public void RequestFriend(string username) {
+        Debug.Log("Adding friend: " + username);
+        //TODO: Uncomment when database ready
+        /*
+        StartCoroutine(onlineManager.AddFriend(userData.id.ToString(), username, result => {
+            foreach (KeyValuePair<string, SimpleJSON.JSONNode> entry in result) {
+                if (!userData.friends.Exists(x => x == entry.Value)) {
+                    userData.friends.Add(entry.Value);
+                    friendsPanel.ShowFriend(entry.Value);
+                }
+            }
+        }));
+        */
+    }
+    public void AcceptFriendRequest(string username) {
+        StartCoroutine(onlineManager.AcceptFriend(userData.id.ToString(), username, result => {
+
+        }));
+    }
+    public void DeclineFriendRequest(string username) {
+        //TODO: Uncomment when database ready
+        /*
+        StartCoroutine(onlineManager.DeclineFriend(userData.id.ToString(), username, result => {
+
+        }));
+        */
+    }
+
+    //Game Post and Update
+    public void AcceptGameRequest(string gameId) {
+        //TODO: Uncomment when database ready
+        /*
+        StartCoroutine(onlineManager.AcceptGame(userData.id.ToString(), gameId, result => {
+
+        }));
+        */
+    }
+    public void DeclineGameRequest(string gameId) {
+        //TODO: Uncomment when database ready
+        /*
+        StartCoroutine(onlineManager.DeclineGame(userData.id.ToString(), gameId, result => {
+
+        }));
+        */
+    }
+
+
 
     #endregion
 }

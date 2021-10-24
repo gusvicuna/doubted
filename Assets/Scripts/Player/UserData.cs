@@ -9,9 +9,9 @@ public class UserData
     public int id;
     public string username;
     public List<string> friends;
+    public List<string> friendsInvited;
     public List<GameData> games = new List<GameData>();
-    public string[] gamesInvited;
-    public string[] friendsInvited;
+    public List<GameData> gamesInvited = new List<GameData>();
 
     #endregion
 

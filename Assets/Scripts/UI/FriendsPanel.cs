@@ -28,9 +28,13 @@ public class FriendsPanel : MonoBehaviour
         addFriendButton.gameObject.SetActive(false);
     }
 
-    public void AddFriend(string friendUsername) {
+    public void ShowFriend(string friendUsername) {
         GameObject friendPanel = Instantiate(friendPanelPrefab, friendsList.transform);
         friendPanel.GetComponentInChildren<Text>().text = friendUsername; 
+    }
+
+    public void AddFriend() {
+        menuManager.RequestFriend(usernameInputField.text);
     }
 
     public void SearchFriend() {
