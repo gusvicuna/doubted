@@ -31,6 +31,9 @@ public class LoginManager : MonoBehaviour
         if (PlayerPrefs.GetString("username") != null) {
             loginUsername.text = PlayerPrefs.GetString("username");
         }
+        if (PlayerPrefs.GetInt("logedIn") == 1) {
+            LogIn();
+        }
         loginUsername.onValueChanged.AddListener(delegate { SaveUsername(); });
     }
 
@@ -39,12 +42,12 @@ public class LoginManager : MonoBehaviour
     #region Public Methods
 
     public void LogIn() {
-
         StartCoroutine(onlineManager.GetPlayerId(PlayerPrefs.GetString("username"), result => {
             if (result != null) {
                 menuManager.userData.id = result["user_id"];
                 menuManager.updating = true;
-                menuManager.DoSomething();
+                menuManager.UpdateDatas();
+                PlayerPrefs.SetInt("logedIn", 1);
                 ChangePanels();
             }
         }));

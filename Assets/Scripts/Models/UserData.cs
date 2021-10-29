@@ -8,13 +8,20 @@ public class UserData
 
     public int id;
     public string username;
-    public List<string> friends;
-    public List<string> friendsInvited;
-    public List<GameData> games = new List<GameData>();
-    public List<GameData> gamesInvited = new List<GameData>();
+
+    public List<UserData> friends;
+    public List<UserData> friendsInvited;
+    public List<GameData> games;
+    public List<GameData> gamesInvited;
 
     #endregion
 
+    public UserData() {
+        friends = new List<UserData>();
+        friendsInvited = new List<UserData>();
+        games = new List<GameData>();
+        gamesInvited = new List<GameData>();
+    }
 
     #region JSON
 

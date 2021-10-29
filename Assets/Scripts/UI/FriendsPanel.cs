@@ -12,37 +12,63 @@ public class FriendsPanel : MonoBehaviour
     public Text friendSearchText;
     public Button addFriendButton;
 
+    private UserData userSearched;
+
     public GameObject friendPanelPrefab;
     public GameObject friendsList;
 
-    private MenuManager menuManager;
+    private MenuManager _menuManager;
     private OnlineManager onlineManager;
     #endregion
 
-    private void Start() {
-        menuManager = MenuManager.singleton;
+
+    #region MonoBehaviour Callbacks
+
+    private void OnEnable() {
+        _menuManager = MenuManager.singleton;
         onlineManager = OnlineManager.singleton;
 
         feedbackText.text = "";
         friendSearchText.text = "";
         addFriendButton.gameObject.SetActive(false);
+
+        UpdateFriends();
     }
 
-    public void ShowFriend(string friendUsername) {
-        GameObject friendPanel = Instantiate(friendPanelPrefab, friendsList.transform);
-        friendPanel.GetComponentInChildren<Text>().text = friendUsername; 
+    #endregion
+
+
+    #region Public Methods
+
+    public void UpdateFriends() {
+        Debug.Log("Updating friends");
+        foreach (Transform child in friendsList.transform) {
+            Destroy(child.gameObject);
+        }
+        foreach (UserData friend in _menuManager.userData.friends) {
+            GameObject friendPanel = Instantiate(friendPanelPrefab, friendsList.transform);
+            friendPanel.GetComponentInChildren<Text>().text = friend.username;
+        }
     }
 
     public void AddFriend() {
-        menuManager.RequestFriend(usernameInputField.text);
+        _menuManager.RequestFriend(userSearched);
     }
 
     public void SearchFriend() {
         StartCoroutine(onlineManager.GetPlayerId(usernameInputField.text, result => {
             if (result != null) {
-                feedbackText.text = "";
-                friendSearchText.text = usernameInputField.text;
-                addFriendButton.gameObject.SetActive(true);
+                if(friendSearchText.text == _menuManager.userData.username) {
+                    feedbackText.text = "You are that user.";
+                }
+                else {
+                    userSearched = new UserData();
+                    feedbackText.text = "";
+                    userSearched.id = result["user_id"];
+                    userSearched.username = usernameInputField.text;
+                    friendSearchText.text = userSearched.username;
+                    addFriendButton.gameObject.SetActive(true);
+                }
             }
             else {
                 friendSearchText.text = "";
@@ -51,4 +77,6 @@ public class FriendsPanel : MonoBehaviour
             }
         }));
     }
+
+    #endregion
 }

@@ -7,13 +7,16 @@ public class MenuManager : MonoBehaviour
     #region Public Attributes
 
     //Singleton
+    [HideInInspector]
     public static MenuManager singleton;
 
+    [HideInInspector]
     public UserData userData;
 
+    [Header("Panels:")]
     public MainMenu mainMenu;
-    public FriendsPanel friendsPanel;
-    public Notifications notifications;
+
+    [HideInInspector]
     public bool updating = false;
 
     #endregion
@@ -43,67 +46,67 @@ public class MenuManager : MonoBehaviour
 
     #region Public Methods
 
-    //Update data
-    public void DoSomething() {
-        StartCoroutine(UpdateData());
+    public void LogOut() {
+        PlayerPrefs.SetInt("logedIn", 0);
+        userData = new UserData();
+        updating = false;
     }
 
+    //Update data
+    public void UpdateDatas() {
+        StartCoroutine(UpdateData());
+    }
     public IEnumerator UpdateData() {
         while (updating) {
             UpdateActiveGames();
-            // TODO: UpdateFriends();
-            // TODO: UpdateFriendNotifications();
+            UpdateFriends();
+            UpdateFriendNotifications();
             yield return new WaitForSeconds(5);
         }
     }
 
     public void UpdateActiveGames() {
         StartCoroutine(onlineManager.GetPlayerGames(userData.id.ToString(), result => {
+            userData.games = new List<GameData>();
             foreach (KeyValuePair<string, SimpleJSON.JSONNode> entry in result) {
                 GameData gameData = new GameData();
                 gameData.sala = entry.Value[0];
-                gameData.players = entry.Value[1];
-                if (!userData.games.Exists(x => x.sala == gameData.sala)) {
-                    userData.games.Add(gameData);
-                    mainMenu.AddGame(gameData);
-                }
+                gameData.totalPlayers = entry.Value[1];
+                userData.games.Add(gameData);
             }
         }));
     }
     public void UpdateFriends() {
         StartCoroutine(onlineManager.GetPlayerFriends(userData.id.ToString(), result => {
+            userData.friends = new List<UserData>();
             foreach (KeyValuePair<string, SimpleJSON.JSONNode> entry in result) {
-                if (!userData.friends.Exists(x => x == entry.Value)) {
-                    userData.friends.Add(entry.Value);
-                    friendsPanel.ShowFriend(entry.Value);
+                if (entry.Key != "current") {
+                    UserData friendData = new UserData();
+                    friendData.username = entry.Value;
+                    userData.friends.Add(friendData);
                 }
             }
         }));
     }
     public void UpdateFriendNotifications() {
         StartCoroutine(onlineManager.GetFriendNotifications(userData.id.ToString(), result => {
+            userData.friendsInvited = new List<UserData>();
             foreach (KeyValuePair<string, SimpleJSON.JSONNode> entry in result) {
-                if (!userData.friendsInvited.Exists(x => x == entry.Value)) {
-                    userData.friendsInvited.Add(entry.Value);
+                if (entry.Key != "current") {
+                    UserData friendData = new UserData();
+                    friendData.username = entry.Value;
+                    userData.friendsInvited.Add(friendData);
                 }
             }
         }));
     }
 
     //Friend Post and Update
-    public void RequestFriend(string username) {
-        Debug.Log("Adding friend: " + username);
-        //TODO: Uncomment when database ready
-        /*
-        StartCoroutine(onlineManager.AddFriend(userData.id.ToString(), username, result => {
-            foreach (KeyValuePair<string, SimpleJSON.JSONNode> entry in result) {
-                if (!userData.friends.Exists(x => x == entry.Value)) {
-                    userData.friends.Add(entry.Value);
-                    friendsPanel.ShowFriend(entry.Value);
-                }
-            }
+    public void RequestFriend(UserData friend) {
+        Debug.Log("Adding friend: " + friend.username);
+        StartCoroutine(onlineManager.RequestFriend(userData.id.ToString(), friend.id.ToString(), result => {
+
         }));
-        */
     }
     public void AcceptFriendRequest(string username) {
         StartCoroutine(onlineManager.AcceptFriend(userData.id.ToString(), username, result => {

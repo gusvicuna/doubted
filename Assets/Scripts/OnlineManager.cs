@@ -16,7 +16,7 @@ public class OnlineManager : MonoBehaviour
 
     #region Routes
 
-    private const string rootPath = "https://pdsuandes.herokuapp.com/";
+    private const string rootPath = "https://gentle-brook-46195.herokuapp.com/";
 
     #endregion
 
@@ -94,7 +94,7 @@ public class OnlineManager : MonoBehaviour
 
     //GetPlayerFriends(username) = List<username>
     public IEnumerator GetPlayerFriends(string id, System.Action<JSONNode> callback = null) {
-        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/friends" + "?current_id=" + id)) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/get_friends" + "?current_id=" + id)) {
             yield return request.SendWebRequest();
 
             if (request.result == UnityWebRequest.Result.ProtocolError) {
@@ -184,7 +184,7 @@ public class OnlineManager : MonoBehaviour
 
     //GetPlayerFriendInvitations(id)  => List<username>
     public IEnumerator GetFriendNotifications(string id, System.Action<JSONNode> callback = null) {
-        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/get_friends_invitations" + "?current_id=" + id)) {
+        using (UnityWebRequest request = UnityWebRequest.Get(rootPath + "/get_friends_not_accepted" + "?current_id=" + id)) {
             yield return request.SendWebRequest();
 
             if (request.result == UnityWebRequest.Result.ProtocolError) {
@@ -257,7 +257,7 @@ public class OnlineManager : MonoBehaviour
             yield return request.SendWebRequest();
 
             if (request.result == UnityWebRequest.Result.ProtocolError) {
-                Debug.Log(request.error);
+                Debug.LogError(request.error);
                 if (callback != null) {
                     callback.Invoke(null);
                 }
@@ -267,7 +267,7 @@ public class OnlineManager : MonoBehaviour
                     callback.Invoke(JSON.Parse(request.downloadHandler.text));
                 }
                 else {
-                    Debug.Log("error");
+                    Debug.LogError("error");
                 }
             }
         }

@@ -22,20 +22,25 @@ public class Notifications : MonoBehaviour
 
     void Start() {
         _menuManager = MenuManager.singleton;
+
+        UpdateFriendNotifications();
+        UpdateGameNotifications();
     }
 
     public void UpdateFriendNotifications() {
-        foreach (Transform child in this.transform) {
+        Debug.Log("Updating friend notifications");
+        foreach (Transform child in friendNotificationsPanel.transform) {
             Destroy(child.gameObject);
         }
-        foreach (string username in _menuManager.userData.friendsInvited) {
+        foreach (UserData friend in _menuManager.userData.friendsInvited) {
             GameObject friendInvitationPanel = Instantiate(friendNotificationPrefab, friendNotificationsPanel.transform);
-            friendInvitationPanel.GetComponent<FriendNotification>().friendText.text = username;
+            friendInvitationPanel.GetComponent<FriendNotification>().friendText.text = friend.username;
         }
     }
 
     public void UpdateGameNotifications() {
-        foreach (Transform child in this.transform) {
+        Debug.Log("Updating game notifications");
+        foreach (Transform child in gameNotificationsPanel.transform) {
             Destroy(child.gameObject);
         }
         foreach (GameData game in _menuManager.userData.gamesInvited) {
