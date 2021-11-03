@@ -13,8 +13,9 @@ public class MenuManager : MonoBehaviour
     [HideInInspector]
     public UserData userData;
 
-    [Header("Panels:")]
+    [Header("Panels:")] 
     public MainMenu mainMenu;
+    public Login loginMenu;
 
     [HideInInspector]
     public bool updating = false;
@@ -52,7 +53,24 @@ public class MenuManager : MonoBehaviour
         updating = false;
     }
 
+    public void LogIn() {
+        StartCoroutine(onlineManager.GetPlayer(PlayerPrefs.GetString("username"), result => {
+            if (result == null) return;
+
+            userData.id = result["id"];
+            userData.username = result["username"];
+            userData.GenerateLists();
+
+            updating = true;
+            UpdateDatas();
+            PlayerPrefs.SetInt("logedIn", 1);
+
+            loginMenu.ChangePanels();
+        }));
+    }
+
     //Update data
+
     public void UpdateDatas() {
         StartCoroutine(UpdateData());
     }
@@ -79,37 +97,45 @@ public class MenuManager : MonoBehaviour
     public void UpdateFriends() {
         StartCoroutine(onlineManager.GetPlayerFriends(userData.id.ToString(), result => {
             userData.friends = new List<UserData>();
-            foreach (KeyValuePair<string, SimpleJSON.JSONNode> entry in result) {
-                if (entry.Key != "current") {
-                    UserData friendData = new UserData();
-                    friendData.username = entry.Value;
-                    userData.friends.Add(friendData);
+            Debug.Log(result);
+            foreach (SimpleJSON.JSONNode friendship in result)
+            {
+                UserData friendData = new UserData();
+                if (friendship["invitatorUser"]["username"] == userData.username)
+                {
+                    friendData.username = friendship["invitatedUser"]["username"];
+                    friendData.id = friendship["invitatedUser"]["id"];
                 }
+                else
+                {
+                    friendData.username = friendship["invitatorUser"]["username"];
+                    friendData.id = friendship["invitatorUser"]["id"];
+                }
+                userData.friends.Add(friendData);
             }
         }));
     }
     public void UpdateFriendNotifications() {
         StartCoroutine(onlineManager.GetFriendNotifications(userData.id.ToString(), result => {
             userData.friendsInvited = new List<UserData>();
-            foreach (KeyValuePair<string, SimpleJSON.JSONNode> entry in result) {
-                if (entry.Key != "current") {
-                    UserData friendData = new UserData();
-                    friendData.username = entry.Value;
-                    userData.friendsInvited.Add(friendData);
-                }
+            foreach (SimpleJSON.JSONNode friendship in result)
+            {
+                UserData friendData = new UserData();
+                friendData.username = friendship["invitatorUser"]["username"];
+                friendData.id = friendship["invitatorUser"]["id"];
+                userData.friendsInvited.Add(friendData);
             }
         }));
     }
 
     //Friend Post and Update
     public void RequestFriend(UserData friend) {
-        Debug.Log("Adding friend: " + friend.username);
-        StartCoroutine(onlineManager.RequestFriend(userData.id.ToString(), friend.id.ToString(), result => {
+        StartCoroutine(onlineManager.RequestFriend(userData.id.ToString(), friend.Stringify(), result => {
 
         }));
     }
-    public void AcceptFriendRequest(string username) {
-        StartCoroutine(onlineManager.AcceptFriend(userData.id.ToString(), username, result => {
+    public void AcceptFriendRequest(UserData friend) {
+        StartCoroutine(onlineManager.AcceptFriend(userData.id.ToString(), friend.id.ToString(), result => {
 
         }));
     }

@@ -56,15 +56,25 @@ public class FriendsPanel : MonoBehaviour
     }
 
     public void SearchFriend() {
-        StartCoroutine(onlineManager.GetPlayerId(usernameInputField.text, result => {
-            if (result != null) {
-                if(friendSearchText.text == _menuManager.userData.username) {
+        StartCoroutine(onlineManager.GetPlayer(usernameInputField.text, result => {
+            if (result != null)
+            {
+                Debug.Log(usernameInputField.text);
+                if(usernameInputField.text == _menuManager.userData.username) {
                     feedbackText.text = "You are that user.";
                 }
                 else {
+                    foreach (var userDataFriend in _menuManager.userData.friends)
+                    {
+                        if (usernameInputField.text == userDataFriend.username)
+                        {
+                            feedbackText.text = "You already have that friend.";
+                            return;
+                        }
+                    }
                     userSearched = new UserData();
                     feedbackText.text = "";
-                    userSearched.id = result["user_id"];
+                    userSearched.id = result["id"];
                     userSearched.username = usernameInputField.text;
                     friendSearchText.text = userSearched.username;
                     addFriendButton.gameObject.SetActive(true);

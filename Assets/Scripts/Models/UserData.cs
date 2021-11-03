@@ -17,6 +17,11 @@ public class UserData
     #endregion
 
     public UserData() {
+        GenerateLists();
+    }
+
+    public void GenerateLists()
+    {
         friends = new List<UserData>();
         friendsInvited = new List<UserData>();
         games = new List<GameData>();

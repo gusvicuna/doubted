@@ -7,6 +7,7 @@ public class FriendNotification : MonoBehaviour
 {
 
     public Text friendText;
+    public UserData friendData;
 
     private MenuManager _menuManager;
 
@@ -15,7 +16,8 @@ public class FriendNotification : MonoBehaviour
     }
 
     public void AcceptFriend() {
-        _menuManager.AcceptFriendRequest(friendText.text);
+        _menuManager.AcceptFriendRequest(friendData);
+        Destroy(this.gameObject);
     }
 
     public void DeclineFriend() {

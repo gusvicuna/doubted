@@ -20,7 +20,7 @@ public class Notifications : MonoBehaviour
 
     #endregion
 
-    void Start() {
+    void OnEnable() {
         _menuManager = MenuManager.singleton;
 
         UpdateFriendNotifications();
@@ -34,6 +34,7 @@ public class Notifications : MonoBehaviour
         }
         foreach (UserData friend in _menuManager.userData.friendsInvited) {
             GameObject friendInvitationPanel = Instantiate(friendNotificationPrefab, friendNotificationsPanel.transform);
+            friendInvitationPanel.GetComponent<FriendNotification>().friendData = friend;
             friendInvitationPanel.GetComponent<FriendNotification>().friendText.text = friend.username;
         }
     }

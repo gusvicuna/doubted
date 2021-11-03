@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LoginManager : MonoBehaviour
+public class Login : MonoBehaviour
 {
     #region Public Attributes
 
@@ -32,40 +32,24 @@ public class LoginManager : MonoBehaviour
             loginUsername.text = PlayerPrefs.GetString("username");
         }
         if (PlayerPrefs.GetInt("logedIn") == 1) {
-            LogIn();
+            menuManager.LogIn();
         }
         loginUsername.onValueChanged.AddListener(delegate { SaveUsername(); });
     }
 
     #endregion
 
-    #region Public Methods
-
-    public void LogIn() {
-        StartCoroutine(onlineManager.GetPlayerId(PlayerPrefs.GetString("username"), result => {
-            if (result != null) {
-                menuManager.userData.id = result["user_id"];
-                menuManager.updating = true;
-                menuManager.UpdateDatas();
-                PlayerPrefs.SetInt("logedIn", 1);
-                ChangePanels();
-            }
-        }));
+    public void ChangePanels() {
+        mainMenuPanel.SetActive(true);
+        miniMenuPanel.SetActive(true);
+        gameObject.SetActive(false);
     }
-
-    #endregion
 
 
     #region Private Methods
 
-    private void ChangePanels() {
-        mainMenuPanel.SetActive(true);
-        miniMenuPanel.SetActive(true);
-        this.gameObject.SetActive(false);
-    }
-
     private void SaveUsername() {
-        PlayerPrefs.SetString("username", loginUsername.text.ToString());
+        PlayerPrefs.SetString("username", loginUsername.text.ToLower());
     }
 
     #endregion
