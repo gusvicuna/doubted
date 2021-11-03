@@ -285,23 +285,22 @@ public class OnlineManager : MonoBehaviour
     }
 
     //DeleteAddFriend(id, target_id)
-    public IEnumerator DeclineFriend(string id, string target_id, System.Action<JSONNode> callback = null) {
-        using (UnityWebRequest request = UnityWebRequest.Get(RootPath + "/decline_friend_request" + "?current_id=" + id + "?target_id=" + target_id)) {
-            yield return request.SendWebRequest();
+    public IEnumerator DeleteFriendship(string id, string target_id, System.Action<JSONNode> callback = null)
+    {
+        using UnityWebRequest request = new UnityWebRequest(LocalHostPath + "/users/" + id + "/friends/" + target_id,"DELETE");
+        request.downloadHandler = new DownloadHandlerBuffer();
+        yield return request.SendWebRequest();
 
-            if (request.result == UnityWebRequest.Result.ProtocolError) {
-                Debug.Log(request.error);
-                if (callback != null) {
-                    callback.Invoke(null);
-                }
+        if (request.result == UnityWebRequest.Result.ProtocolError) {
+            Debug.Log(request.error);
+            callback?.Invoke(null);
+        }
+        else {
+            if (callback != null) {
+                callback.Invoke(JSON.Parse(request.downloadHandler.text));
             }
             else {
-                if (callback != null) {
-                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
-                }
-                else {
-                    Debug.Log("error");
-                }
+                Debug.Log("error");
             }
         }
     }

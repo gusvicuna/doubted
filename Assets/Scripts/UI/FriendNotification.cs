@@ -17,10 +17,13 @@ public class FriendNotification : MonoBehaviour
 
     public void AcceptFriend() {
         _menuManager.AcceptFriendRequest(friendData);
-        Destroy(this.gameObject);
+        Destroy(gameObject);
     }
 
-    public void DeclineFriend() {
-        _menuManager.DeclineFriendRequest(friendText.text);
+    public void DeclineFriend()
+    {
+        _menuManager.userData.friendsInvited.Remove(friendData);
+        _menuManager.RemoveFriendship(friendData);
+        Destroy(gameObject);
     }
 }

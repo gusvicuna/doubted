@@ -139,13 +139,11 @@ public class MenuManager : MonoBehaviour
 
         }));
     }
-    public void DeclineFriendRequest(string username) {
-        //TODO: Uncomment when database ready
-        /*
-        StartCoroutine(onlineManager.DeclineFriend(userData.id.ToString(), username, result => {
+    public void RemoveFriendship(UserData FriendData) {
+        StartCoroutine(onlineManager.DeleteFriendship(userData.id.ToString(), FriendData.id.ToString(), result => {
 
         }));
-        */
+        
     }
 
     //Game Post and Update

@@ -48,11 +48,19 @@ public class FriendsPanel : MonoBehaviour
         foreach (UserData friend in _menuManager.userData.friends) {
             GameObject friendPanel = Instantiate(friendPanelPrefab, friendsList.transform);
             friendPanel.GetComponentInChildren<Text>().text = friend.username;
+            friendPanel.GetComponent<Friend>().friendData = friend;
+            friendPanel.GetComponent<Friend>().myDelegate += RemoveFriend;
         }
     }
 
     public void AddFriend() {
         _menuManager.RequestFriend(userSearched);
+    }
+
+    public void RemoveFriend(UserData FriendData)
+    {
+        _menuManager.userData.friends.Remove(FriendData);
+        _menuManager.RemoveFriendship(FriendData);
     }
 
     public void SearchFriend() {
