@@ -32,7 +32,7 @@ public class Notifications : MonoBehaviour
         foreach (Transform child in friendNotificationsPanel.transform) {
             Destroy(child.gameObject);
         }
-        foreach (UserData friend in _menuManager.userData.friendsInvited) {
+        foreach (UserData friend in _menuManager.currentUserData.friendsInvited) {
             GameObject friendInvitationPanel = Instantiate(friendNotificationPrefab, friendNotificationsPanel.transform);
             friendInvitationPanel.GetComponent<FriendNotification>().friendData = friend;
             friendInvitationPanel.GetComponent<FriendNotification>().friendText.text = friend.username;
@@ -44,9 +44,10 @@ public class Notifications : MonoBehaviour
         foreach (Transform child in gameNotificationsPanel.transform) {
             Destroy(child.gameObject);
         }
-        foreach (GameData game in _menuManager.userData.gamesInvited) {
+        foreach (PlayerData player in _menuManager.currentUserData.gamesInvited) {
             GameObject gameInvitation = Instantiate(gameNotificationPrefab, gameNotificationsPanel.transform);
-            gameInvitation.GetComponent<GameNotification>().gameIdText.text = game.sala.ToString();
+            gameInvitation.GetComponent<GameNotification>().playerData = player;
+            gameInvitation.GetComponent<GameNotification>().gameIdText.text = player.gameId.ToString();
         }
     }
 }

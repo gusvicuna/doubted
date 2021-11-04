@@ -13,7 +13,7 @@ public class AddFriendPanel : MonoBehaviour
     [HideInInspector]
     public OnAddFriendCLickedDelegate myDelegate;
 
-    private Text _friendUsernameText;
+    public Text _friendUsernameText;
 
     void Start()
     {

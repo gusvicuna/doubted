@@ -4,15 +4,31 @@ using UnityEngine;
 
 public class PlayerData
 {
+    public long id;
+
     public UserData user;
     public GameData game;
 
-    public bool aceptationState;
-    public List<pinta> dados;
+    public long userId;
+    public long gameId;
+
+    public int turnNumber;
+    public string name;
+    public bool acceptationState;
+    public List<pinta> dice;
     public bool haObligado;
-    public string lastAction;
+    public PredictionData lastPrediction;
 
     public PlayerData() {
-        dados = new List<pinta>();
+        dice = new List<pinta>();
+        lastPrediction = new PredictionData();
+    }
+
+    public string Stringify() {
+        return JsonUtility.ToJson(this);
+    }
+
+    public static PlayerData Parse(string json) {
+        return JsonUtility.FromJson<PlayerData>(json);
     }
 }

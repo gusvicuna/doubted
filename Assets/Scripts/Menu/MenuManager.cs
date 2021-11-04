@@ -11,7 +11,7 @@ public class MenuManager : MonoBehaviour
     public static MenuManager singleton;
 
     [HideInInspector]
-    public UserData userData;
+    public UserData currentUserData;
 
     [Header("Panels:")] 
     public MainMenu mainMenu;
@@ -37,7 +37,7 @@ public class MenuManager : MonoBehaviour
         //Singleton
         if (singleton == null) singleton = this;
 
-        userData = new UserData();
+        currentUserData = new UserData();
         
         onlineManager = OnlineManager.singleton;
     }
@@ -49,17 +49,17 @@ public class MenuManager : MonoBehaviour
 
     public void LogOut() {
         PlayerPrefs.SetInt("logedIn", 0);
-        userData = new UserData();
+        currentUserData = new UserData();
         updating = false;
     }
 
     public void LogIn() {
-        StartCoroutine(onlineManager.GetPlayer(PlayerPrefs.GetString("username"), result => {
+        StartCoroutine(onlineManager.GetUser(PlayerPrefs.GetString("username"), result => {
             if (result == null) return;
 
-            userData.id = result["id"];
-            userData.username = result["username"];
-            userData.GenerateLists();
+            currentUserData.id = result["id"];
+            currentUserData.username = result["username"];
+            currentUserData.GenerateLists();
 
             updating = true;
             UpdateDatas();
@@ -79,29 +79,32 @@ public class MenuManager : MonoBehaviour
             UpdateActiveGames();
             UpdateFriends();
             UpdateFriendNotifications();
+            UpdateGameNotifications();
             yield return new WaitForSeconds(5);
         }
     }
 
     public void UpdateActiveGames() {
-        StartCoroutine(onlineManager.GetPlayerGames(userData.id.ToString(), result => {
-            userData.games = new List<GameData>();
-            foreach (KeyValuePair<string, SimpleJSON.JSONNode> entry in result) {
+        StartCoroutine(onlineManager.GetUserGames(currentUserData.id.ToString(), result => {
+            currentUserData.games = new List<GameData>();
+            foreach (SimpleJSON.JSONNode game in result)
+            {
                 GameData gameData = new GameData();
-                gameData.sala = entry.Value[0];
-                gameData.totalPlayers = entry.Value[1];
-                userData.games.Add(gameData);
+                gameData.id = game["id"];
+                gameData.gameName = game["gameName"];
+                gameData.playerTurn = game["playerTurn"];
+                gameData.maxPlayers = game["maxPlayers"];
+                currentUserData.games.Add(gameData);
             }
         }));
     }
     public void UpdateFriends() {
-        StartCoroutine(onlineManager.GetPlayerFriends(userData.id.ToString(), result => {
-            userData.friends = new List<UserData>();
-            Debug.Log(result);
+        StartCoroutine(onlineManager.GetUserFriends(currentUserData.id.ToString(), result => {
+            currentUserData.friends = new List<UserData>();
             foreach (SimpleJSON.JSONNode friendship in result)
             {
                 UserData friendData = new UserData();
-                if (friendship["invitatorUser"]["username"] == userData.username)
+                if (friendship["invitatorUser"]["username"] == currentUserData.username)
                 {
                     friendData.username = friendship["invitatedUser"]["username"];
                     friendData.id = friendship["invitatedUser"]["id"];
@@ -111,57 +114,66 @@ public class MenuManager : MonoBehaviour
                     friendData.username = friendship["invitatorUser"]["username"];
                     friendData.id = friendship["invitatorUser"]["id"];
                 }
-                userData.friends.Add(friendData);
+                currentUserData.friends.Add(friendData);
             }
         }));
     }
     public void UpdateFriendNotifications() {
-        StartCoroutine(onlineManager.GetFriendNotifications(userData.id.ToString(), result => {
-            userData.friendsInvited = new List<UserData>();
+        StartCoroutine(onlineManager.GetFriendNotifications(currentUserData.id.ToString(), result => {
+            currentUserData.friendsInvited = new List<UserData>();
             foreach (SimpleJSON.JSONNode friendship in result)
             {
                 UserData friendData = new UserData();
                 friendData.username = friendship["invitatorUser"]["username"];
                 friendData.id = friendship["invitatorUser"]["id"];
-                userData.friendsInvited.Add(friendData);
+                currentUserData.friendsInvited.Add(friendData);
+            }
+        }));
+    }
+
+    public void UpdateGameNotifications() {
+        StartCoroutine(onlineManager.GetGameNotifications(currentUserData.id.ToString(), result => {
+            currentUserData.gamesInvited = new List<PlayerData>();
+            foreach (SimpleJSON.JSONNode player in result) {
+                PlayerData playerData = new PlayerData();
+                playerData.gameId = player["gameId"];
+                playerData.userId = player["userId"];
+                playerData.id = player["id"];
+                currentUserData.gamesInvited.Add(playerData);
             }
         }));
     }
 
     //Friend Post and Update
     public void RequestFriend(UserData friend) {
-        StartCoroutine(onlineManager.RequestFriend(userData.id.ToString(), friend.Stringify(), result => {
+        StartCoroutine(onlineManager.RequestFriend(currentUserData.id.ToString(), friend.Stringify(), result => {
 
         }));
     }
     public void AcceptFriendRequest(UserData friend) {
-        StartCoroutine(onlineManager.AcceptFriend(userData.id.ToString(), friend.id.ToString(), result => {
+        StartCoroutine(onlineManager.AcceptFriend(currentUserData.id.ToString(), friend.id.ToString(), result => {
 
         }));
     }
-    public void RemoveFriendship(UserData FriendData) {
-        StartCoroutine(onlineManager.DeleteFriendship(userData.id.ToString(), FriendData.id.ToString(), result => {
+    public void RemoveFriendship(UserData friendData) {
+        StartCoroutine(onlineManager.DeleteFriendship(currentUserData.id.ToString(), friendData.id.ToString(), result => {
 
         }));
         
     }
 
     //Game Post and Update
-    public void AcceptGameRequest(string gameId) {
-        //TODO: Uncomment when database ready
-        /*
-        StartCoroutine(onlineManager.AcceptGame(userData.id.ToString(), gameId, result => {
+    public void AcceptGameRequest(PlayerData playerData) {
+
+        StartCoroutine(onlineManager.AcceptGame(playerData.id.ToString(),playerData.Stringify(), result => {
 
         }));
-        */
     }
-    public void DeclineGameRequest(string gameId) {
-        //TODO: Uncomment when database ready
-        /*
-        StartCoroutine(onlineManager.DeclineGame(userData.id.ToString(), gameId, result => {
+    public void DeclineGameRequest(PlayerData playerData) {
+
+        StartCoroutine(onlineManager.DeclineGame(playerData.id.ToString(), result => {
 
         }));
-        */
     }
 
 

@@ -30,7 +30,7 @@ public class JoinGame : MonoBehaviour
     }
 
     public void JoinSala() {
-        StartCoroutine(onlineManager.JoinGame(menuManager.userData.id.ToString(),nameInputField.text, result => {
+        StartCoroutine(onlineManager.JoinGame(menuManager.currentUserData.id.ToString(),nameInputField.text, result => {
             if (result != null) {
                 feedbackText.text = "Game joined.";
             }

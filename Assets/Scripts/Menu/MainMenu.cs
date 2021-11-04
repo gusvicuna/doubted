@@ -26,10 +26,13 @@ public class MainMenu : MonoBehaviour
         foreach (Transform child in activeGamesList.transform) {
             Destroy(child.gameObject);
         }
-        foreach (GameData gameData in _menuManager.userData.games) {
+        foreach (GameData gameData in _menuManager.currentUserData.games) {
+            Debug.Log(gameData.id);
             GameObject activeGame = Instantiate(activeGamePrefab, activeGamesList.transform);
-            activeGame.GetComponent<ActiveGame>().salaText.text = gameData.sala.ToString();
-            activeGame.GetComponent<ActiveGame>().playersText.text = gameData.totalPlayers.ToString();
+            activeGame.GetComponent<ActiveGame>().gameData = gameData;
+            activeGame.GetComponent<ActiveGame>().salaText.text = gameData.gameName;
+            activeGame.GetComponent<ActiveGame>().playersText.text = gameData.maxPlayers.ToString();
+            activeGame.GetComponent<ActiveGame>().turnText.text = gameData.playerTurn.ToString();
         }
     }
 

@@ -6,13 +6,13 @@ public class UserData
 {
     #region Public Attributes
 
-    public int id;
+    public long id;
     public string username;
 
     public List<UserData> friends;
     public List<UserData> friendsInvited;
     public List<GameData> games;
-    public List<GameData> gamesInvited;
+    public List<PlayerData> gamesInvited;
 
     #endregion
 
@@ -25,7 +25,7 @@ public class UserData
         friends = new List<UserData>();
         friendsInvited = new List<UserData>();
         games = new List<GameData>();
-        gamesInvited = new List<GameData>();
+        gamesInvited = new List<PlayerData>();
     }
 
     #region JSON

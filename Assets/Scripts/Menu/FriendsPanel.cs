@@ -45,7 +45,7 @@ public class FriendsPanel : MonoBehaviour
         foreach (Transform child in friendsList.transform) {
             Destroy(child.gameObject);
         }
-        foreach (UserData friend in _menuManager.userData.friends) {
+        foreach (UserData friend in _menuManager.currentUserData.friends) {
             GameObject friendPanel = Instantiate(friendPanelPrefab, friendsList.transform);
             friendPanel.GetComponentInChildren<Text>().text = friend.username;
             friendPanel.GetComponent<Friend>().friendData = friend;
@@ -59,20 +59,20 @@ public class FriendsPanel : MonoBehaviour
 
     public void RemoveFriend(UserData FriendData)
     {
-        _menuManager.userData.friends.Remove(FriendData);
+        _menuManager.currentUserData.friends.Remove(FriendData);
         _menuManager.RemoveFriendship(FriendData);
     }
 
     public void SearchFriend() {
-        StartCoroutine(onlineManager.GetPlayer(usernameInputField.text, result => {
+        StartCoroutine(onlineManager.GetUser(usernameInputField.text, result => {
             if (result != null)
             {
                 Debug.Log(usernameInputField.text);
-                if(usernameInputField.text == _menuManager.userData.username) {
+                if(usernameInputField.text == _menuManager.currentUserData.username) {
                     feedbackText.text = "You are that user.";
                 }
                 else {
-                    foreach (var userDataFriend in _menuManager.userData.friends)
+                    foreach (var userDataFriend in _menuManager.currentUserData.friends)
                     {
                         if (usernameInputField.text == userDataFriend.username)
                         {

@@ -4,17 +4,34 @@ using UnityEngine;
 
 public class GameData
 {
-    public string sala;
+    public long id;
+
+    public string gameName;
     public string password;
 
-    public int totalPlayers;
+    public int maxPlayers;
     public List<PlayerData> players;
 
-    public bool state;
     public int round;
-    public PlayerData playerTurn;
+    public int playerTurn;
+
+    public bool gameStarted;
+    public bool newRound;
+
+    public bool obligando;
+    public bool canObligar;
+    public bool canCalzar;
 
     public GameData() {
         players = new List<PlayerData>();
+        newRound = true;
+    }
+
+    public string Stringify() {
+        return JsonUtility.ToJson(this);
+    }
+
+    public static GameData Parse(string json) {
+        return JsonUtility.FromJson<GameData>(json);
     }
 }
