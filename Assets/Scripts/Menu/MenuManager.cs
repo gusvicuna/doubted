@@ -165,7 +165,7 @@ public class MenuManager : MonoBehaviour
     //Game Post and Update
     public void AcceptGameRequest(PlayerData playerData) {
 
-        StartCoroutine(onlineManager.AcceptGame(playerData.id.ToString(),playerData.Stringify(), result => {
+        StartCoroutine(onlineManager.PutPlayer(playerData.id.ToString(),playerData.Stringify(), result => {
 
         }));
     }

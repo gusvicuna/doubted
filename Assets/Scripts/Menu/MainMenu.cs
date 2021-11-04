@@ -27,7 +27,6 @@ public class MainMenu : MonoBehaviour
             Destroy(child.gameObject);
         }
         foreach (GameData gameData in _menuManager.currentUserData.games) {
-            Debug.Log(gameData.id);
             GameObject activeGame = Instantiate(activeGamePrefab, activeGamesList.transform);
             activeGame.GetComponent<ActiveGame>().gameData = gameData;
             activeGame.GetComponent<ActiveGame>().salaText.text = gameData.gameName;

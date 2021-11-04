@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
     public PlayerDice currentPlayerDice;
     public List<PlayerDice> playersDice;
     public GameObject turnPanel;
+    public Text winText;
+    public Text loseText;
 
     public bool updating = true;
     public int updateCooldown = 5;
@@ -54,7 +56,6 @@ public class GameManager : MonoBehaviour
 
             StartCoroutine(_onlineManager.GetGame(currentGameData.id.ToString(), result =>
             {
-                Debug.Log(result);
                 currentGameData.gameName = result["gameName"];
                 currentGameData.password = result["passWord"];
                 currentGameData.maxPlayers = result["maxPlayers"];
@@ -71,29 +72,69 @@ public class GameManager : MonoBehaviour
 
             StartCoroutine(_onlineManager.GetPlayers(currentGameData.id.ToString(), result => {
                 foreach (SimpleJSON.JSONNode player in result) {
+                    if (player["userId"] != currentUserData.id)
+                    {
+                        Debug.Log(player["name"]);
+                        PlayerData player2 = new PlayerData();
+                        player2.haObligado = player["haObligado"];
+                        player2.acceptationState = player["acceptationState"];
+                        player2.turnNumber = player["turnNumber"];
+                        player2.name = player["name"];
+                        foreach (SimpleJSON.JSONNode dado in player["dados"]) {
+                            player2.dice.Add((pinta)(int)dado);
+                        }
+
+                        PredictionData newPredictionData = new PredictionData();
+                        newPredictionData.type = player["lastPType"];
+                        newPredictionData.quantity = player["lastPQuantity"];
+                        newPredictionData.number = (pinta)(int)player["lastPPinta"];
+                        player2.lastPrediction = newPredictionData;
+
+                        currentGameData.players.Add(player2);
+                    }
+                }
+            }));
+
+            yield return new WaitForSeconds(1);
+
+            StartCoroutine(_onlineManager.GetPlayers(currentGameData.id.ToString(), result => {
+                foreach (SimpleJSON.JSONNode player in result) {
                     PlayerData player2 = new PlayerData();
                     player2.haObligado = player["haObligado"];
                     player2.acceptationState = player["acceptationState"];
                     player2.turnNumber = player["turnNumber"];
                     player2.name = player["name"];
-                    foreach (SimpleJSON.JSONNode dado in player["dados"])
-                    {
+                    foreach (SimpleJSON.JSONNode dado in player["dados"]) {
                         player2.dice.Add((pinta)(int)dado);
                     }
 
                     PredictionData newPredictionData = new PredictionData();
                     newPredictionData.type = player["lastPType"];
                     newPredictionData.quantity = player["lastPQuantity"];
-                    newPredictionData.number = (pinta) (int)player["lastPPinta"];
+                    newPredictionData.number = (pinta)(int)player["lastPPinta"];
                     player2.lastPrediction = newPredictionData;
 
                     currentGameData.players.Add(player2);
                 }
             }));
+            StartCoroutine(_onlineManager.GetCurrentPlayer(currentUserData.id.ToString(), currentGameData.id.ToString(), result => {
+                currentPlayerData = new PlayerData();
+                currentPlayerData.haObligado = result["haObligado"];
+                currentPlayerData.acceptationState = result["acceptationState"];
+                currentPlayerData.turnNumber = result["turnNumber"];
+                currentPlayerData.name = result["name"];
+                foreach (SimpleJSON.JSONNode dado in result["dados"]) {
+                    currentPlayerData.dice.Add((pinta)(int)dado);
+                }
 
-            yield return new WaitForSeconds(1);
+                PredictionData newPredictionData = new PredictionData();
+                newPredictionData.type = result["lastPType"];
+                newPredictionData.quantity = result["lastPQuantity"];
+                newPredictionData.number = (pinta)(int)result["lastPPinta"];
+                currentPlayerData.lastPrediction = newPredictionData;
 
-            currentPlayerData = currentGameData.players.Find(p => p.userId == currentUserData.id);
+                currentGameData.players.Add(currentPlayerData);
+            }));
 
             if (!currentGameData.gameStarted)
             {
@@ -103,14 +144,30 @@ public class GameManager : MonoBehaviour
 
             SetGameInfo();
             SetPlayerDice();
-
-            if (currentGameData.playerTurn == currentPlayerData.turnNumber) turnPanel.SetActive(true);
-            if (currentGameData.newRound)
+            if (currentGameData.gameFinished)
             {
-                turnPanel.transform.Find("Doubt Button").gameObject.SetActive(false);
-                turnPanel.transform.Find("Calzar Button").gameObject.SetActive(false);
+                if (currentPlayerData.dice.Count > 0)
+                {
+                    winText.gameObject.SetActive(true);
+                    updating = false;
+                }
+                else
+                {
+                    loseText.gameObject.SetActive(true);
+                    updating = false;
+                }
             }
-            if(!currentGameData.canCalzar) turnPanel.transform.Find("Calzar Button").gameObject.SetActive(false);
+            if (currentGameData.playerTurn == currentPlayerData.turnNumber)
+            {
+                updating = false;
+                turnPanel.SetActive(true);
+                if (currentGameData.newRound) {
+                    turnPanel.transform.Find("Doubt Button").gameObject.SetActive(false);
+                    turnPanel.transform.Find("Calzar Button").gameObject.SetActive(false);
+                }
+                if (!currentGameData.canCalzar) turnPanel.transform.Find("Calzar Button").gameObject.SetActive(false);
+            }
+
 
             yield return new WaitForSeconds(updateCooldown);
         }
@@ -131,10 +188,8 @@ public class GameManager : MonoBehaviour
     private void SetPlayerDice()
     {
         for (int i = 0; i < currentGameData.players.Count; i++) {
-            Debug.Log(currentGameData.players[i].dice.Count);
             playersDice[i].SetDice(currentGameData.players[i], false);
         }
-
         currentPlayerDice.SetDice(currentPlayerData, true);
     }
 
@@ -156,6 +211,8 @@ public class GameManager : MonoBehaviour
         currentPlayerData.lastPrediction = predictionData;
 
         NextTurn();
+
+        UploadData();
 
         SetPlayerDice();
         SetGameInfo();
@@ -191,10 +248,33 @@ public class GameManager : MonoBehaviour
         }
         Debug.Log(trueQuantity);
 
+        if (trueQuantity >= lastPlayerData.lastPrediction.quantity)
+        {
+            currentUserData.dudasIncorrectas += 1;
+            LoseRound(currentPlayerData);
+        }
+        else
+        {
+            currentUserData.dudasCorrectas += 1;
+            LoseRound(lastPlayerData);
+        }
         LoseRound(trueQuantity >= lastPlayerData.lastPrediction.quantity ? currentPlayerData : lastPlayerData);
+
+        UploadData();
 
         SetPlayerDice();
         SetGameInfo();
+    }
+
+    private void UploadData()
+    {
+        StartCoroutine(OnlineManager.singleton.UploadGame(currentGameData.id.ToString(), currentGameData.Stringify()));
+        foreach (var playerData in currentGameData.players)
+        {
+            StartCoroutine(OnlineManager.singleton.PutPlayer(playerData.id.ToString(), playerData.Stringify()));
+        }
+
+        StartCoroutine(OnlineManager.singleton.PutUser(currentUserData.id.ToString(), currentUserData.Stringify()));
     }
 
     public void Calzar() {
@@ -221,8 +301,18 @@ public class GameManager : MonoBehaviour
         }
         Debug.Log(trueQuantity);
 
-        if (trueQuantity == lastPlayerData.lastPrediction.quantity) WinRound();
-        else LoseRound(currentPlayerData);
+        if (trueQuantity == lastPlayerData.lastPrediction.quantity)
+        {
+            currentUserData.calzadasCorrectas += 1;
+            WinRound();
+        }
+        else
+        {
+            currentUserData.calzadasIncorrectas += 1;
+            LoseRound(currentPlayerData);
+        }
+
+        UploadData();
 
         SetPlayerDice();
         SetGameInfo();
@@ -263,6 +353,7 @@ public class GameManager : MonoBehaviour
 
     private void NextTurn()
     {
+        updating = true;
         currentGameData.playerTurn += 1;
         if(currentGameData.players[currentGameData.playerTurn].dice.Count == 0) NextTurn();
         if (currentGameData.playerTurn >= currentGameData.players.Count) currentGameData.playerTurn = 0;

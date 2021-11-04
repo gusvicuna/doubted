@@ -206,7 +206,7 @@ public class OnlineManager : MonoBehaviour
     //InviteToGame(id, target_id)
 
     //AcceptInviteToGame(id, id)
-    public IEnumerator AcceptGame(string id,string profile, System.Action<JSONNode> callback = null) {
+    public IEnumerator PutPlayer(string id,string profile, System.Action<JSONNode> callback = null) {
         using (UnityWebRequest request = new UnityWebRequest(LocalHostPath + "/players/" + id, "PUT")) {
             request.SetRequestHeader("Content-Type", "application/json");
             byte[] bodyRaw = Encoding.UTF8.GetBytes(profile);
@@ -341,6 +341,61 @@ public class OnlineManager : MonoBehaviour
     public IEnumerator GetGame(string game_id, System.Action<JSONNode> callback = null) {
         Debug.Log(game_id);
         using UnityWebRequest request = UnityWebRequest.Get(LocalHostPath + "/games/" + game_id);
+        yield return request.SendWebRequest();
+        if (request.result == UnityWebRequest.Result.ProtocolError) {
+            Debug.Log(request.error);
+            callback?.Invoke(null);
+        }
+        else {
+            callback?.Invoke(JSON.Parse(request.downloadHandler.text));
+        }
+    }
+
+    public IEnumerator UploadGame(string id, string profile, System.Action<JSONNode> callback = null) {
+        using (UnityWebRequest request = new UnityWebRequest(LocalHostPath + "/games/" + id, "PUT")) {
+            request.SetRequestHeader("Content-Type", "application/json");
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(profile);
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            yield return request.SendWebRequest();
+            if (request.result == UnityWebRequest.Result.ProtocolError) {
+                Debug.LogError(request.error);
+                if (callback != null) {
+                    callback.Invoke(false);
+                }
+            }
+            else {
+                if (callback != null) {
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+            }
+        }
+    }
+
+    public IEnumerator PutUser(string id, string profile, System.Action<JSONNode> callback = null) {
+        using (UnityWebRequest request = new UnityWebRequest(LocalHostPath + "/users/" + id, "PUT")) {
+            request.SetRequestHeader("Content-Type", "application/json");
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(profile);
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            yield return request.SendWebRequest();
+            if (request.result == UnityWebRequest.Result.ProtocolError) {
+                Debug.LogError(request.error);
+                if (callback != null) {
+                    callback.Invoke(false);
+                }
+            }
+            else {
+                if (callback != null) {
+                    callback.Invoke(JSON.Parse(request.downloadHandler.text));
+                }
+            }
+        }
+    }
+
+    public IEnumerator GetCurrentPlayer(string id, string game_id, System.Action<JSONNode> callback = null) {
+        Debug.Log(game_id);
+        using UnityWebRequest request = UnityWebRequest.Get(LocalHostPath + "/users/" + id + "/" + game_id + "/players");
         yield return request.SendWebRequest();
         if (request.result == UnityWebRequest.Result.ProtocolError) {
             Debug.Log(request.error);

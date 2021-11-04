@@ -16,6 +16,7 @@ public class GameData
     public int playerTurn;
 
     public bool gameStarted;
+    public bool gameFinished;
     public bool newRound;
 
     public bool obligando;

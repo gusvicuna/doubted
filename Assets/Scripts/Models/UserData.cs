@@ -14,6 +14,13 @@ public class UserData
     public List<GameData> games;
     public List<PlayerData> gamesInvited;
 
+    public int wins;
+    public int loses;
+    public int dudasCorrectas;
+    public int dudasIncorrectas;
+    public int calzadasCorrectas;
+    public int calzadasIncorrectas;
+
     #endregion
 
     public UserData() {

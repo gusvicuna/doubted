@@ -102,6 +102,7 @@ public class CreateGameController : MonoBehaviour
         PlayerData playerData = new PlayerData();
         playerData.user = userData;
         playerData.userId = userData.id;
+        playerData.name = userData.username;
         gameData.players.Add(playerData);
 
 

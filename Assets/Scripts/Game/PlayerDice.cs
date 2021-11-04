@@ -33,7 +33,6 @@ public class PlayerDice : MonoBehaviour
 
     public void SetDice(PlayerData player, bool show)
     {
-        Debug.Log(player.dice.Count);
         if (player.dice.Count == 5)
         {
             die5.SetActive(true);
