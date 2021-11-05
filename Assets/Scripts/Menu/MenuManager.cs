@@ -96,6 +96,7 @@ public class MenuManager : MonoBehaviour
                 gameData.maxPlayers = game["maxPlayers"];
                 currentUserData.games.Add(gameData);
             }
+            mainMenu.UpdateGames();
         }));
     }
     public void UpdateFriends() {

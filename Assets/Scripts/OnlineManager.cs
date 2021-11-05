@@ -17,7 +17,7 @@ public class OnlineManager : MonoBehaviour
     #region Routes
 
     private const string RootPath = "https://gentle-brook-46195.herokuapp.com/";
-    private const string LocalHostPath = "http://localhost:38619/api";
+    private const string LocalHostPath = "https://doubtedapi20211029141217.azurewebsites.net/api";
 
     #endregion
 
