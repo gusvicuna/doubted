@@ -177,6 +177,7 @@ MonoBehaviour:
   salaText: {fileID: 6875826708927226588}
   playersText: {fileID: 6875826709335051359}
   turnText: {fileID: 6875826709396121730}
+  joinButton: {fileID: 8278845847249896493}
   menuManager: {fileID: 0}
 --- !u!1 &6875826708051093399
 GameObject:
@@ -670,7 +671,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7339041663764994242
 RectTransform:
   m_ObjectHideFlags: 0

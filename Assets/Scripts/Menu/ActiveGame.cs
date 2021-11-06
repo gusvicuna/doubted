@@ -9,6 +9,7 @@ public class ActiveGame : MonoBehaviour
     public Text salaText;
     public Text playersText;
     public Text turnText;
+    public GameObject joinButton;
 
     public GameData gameData;
 

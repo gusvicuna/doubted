@@ -33,49 +33,49 @@ public class PlayerDice : MonoBehaviour
 
     public void SetDice(PlayerData player, bool show)
     {
-        if (player.dice.Count == 5)
+        if (player.dados.Count == 5)
         {
             die5.SetActive(true);
-            if (show) SetDieSprite(die5.GetComponentInChildren<Image>(), player.dice[4]);
+            if (show) SetDieSprite(die5.GetComponentInChildren<Image>(), player.dados[4]);
             else SetDieSprite(die5.GetComponentInChildren<Image>());
         }
         else die5.SetActive(false);
-        if (player.dice.Count >= 4) {
+        if (player.dados.Count >= 4) {
             die4.SetActive(true);
-            if (show) SetDieSprite(die4.GetComponentInChildren<Image>(), player.dice[3]);
+            if (show) SetDieSprite(die4.GetComponentInChildren<Image>(), player.dados[3]);
             else SetDieSprite(die4.GetComponentInChildren<Image>());
         }
         else die4.SetActive(false);
-        if (player.dice.Count >= 3) {
+        if (player.dados.Count >= 3) {
             die3.SetActive(true);
-            if (show) SetDieSprite(die3.GetComponentInChildren<Image>(), player.dice[2]);
+            if (show) SetDieSprite(die3.GetComponentInChildren<Image>(), player.dados[2]);
             else SetDieSprite(die3.GetComponentInChildren<Image>());
         }
         else die3.SetActive(false);
-        if (player.dice.Count >= 2) {
+        if (player.dados.Count >= 2) {
             die2.SetActive(true);
-            if (show) SetDieSprite(die2.GetComponentInChildren<Image>(), player.dice[1]);
+            if (show) SetDieSprite(die2.GetComponentInChildren<Image>(), player.dados[1]);
             else SetDieSprite(die2.GetComponentInChildren<Image>());
         }
         else die2.SetActive(false);
-        if (player.dice.Count >= 1) {
+        if (player.dados.Count >= 1) {
             die1.SetActive(true);
-            if (show) SetDieSprite(die1.GetComponentInChildren<Image>(), player.dice[0]);
+            if (show) SetDieSprite(die1.GetComponentInChildren<Image>(), player.dados[0]);
             else SetDieSprite(die1.GetComponentInChildren<Image>());
         }
         else die1.SetActive(false);
     }
 
-    public void SetDieSprite(Image die, pinta pinta = pinta.Unknown)
+    public void SetDieSprite(Image die, int pinta = 0)
     {
         die.sprite = pinta switch
         {
-            pinta.As => dice1Sprite,
-            pinta.Tonto => dice2Sprite,
-            pinta.Tren => dice3Sprite,
-            pinta.Cuarta => dice4Sprite,
-            pinta.Quinta => dice5Sprite,
-            pinta.Sexta => dice6Sprite,
+            1 => dice1Sprite,
+            2 => dice2Sprite,
+            3 => dice3Sprite,
+            4 => dice4Sprite,
+            5 => dice5Sprite,
+            6 => dice6Sprite,
             _ => dice0Sprite
         };
     }

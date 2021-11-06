@@ -53,6 +53,7 @@ public class CreateGameController : MonoBehaviour
         PlayerData playerData = new PlayerData();
         playerData.user = _menuManager.currentUserData;
         playerData.userId = _menuManager.currentUserData.id;
+        playerData.name = _menuManager.currentUserData.username;
         playerData.acceptationState = true;
 
         gameData.players.Add(playerData);
@@ -89,12 +90,16 @@ public class CreateGameController : MonoBehaviour
             gameData.id = result["id"];
         }));
 
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(1);
 
+        int turn = 0;
         foreach (var playerData in gameData.players) {
             playerData.gameId = gameData.id;
-            Debug.Log(playerData.Stringify());
-            StartCoroutine(_onlineManager.NewPlayer(playerData.Stringify()));
+            playerData.turnNumber = turn;
+            turn++;
+            StartCoroutine(_onlineManager.NewPlayer(playerData.Stringify(), result => {
+                Debug.Log(result);
+            }));
         }
     }
 

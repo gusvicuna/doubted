@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,6 +33,8 @@ public class MainMenu : MonoBehaviour
             activeGame.GetComponent<ActiveGame>().salaText.text = gameData.gameName;
             activeGame.GetComponent<ActiveGame>().playersText.text = gameData.maxPlayers.ToString();
             activeGame.GetComponent<ActiveGame>().turnText.text = gameData.playerTurn.ToString();
+            bool gameReady = gameData.players.All(playerData => playerData.acceptationState);
+            if(gameReady) activeGame.GetComponent<ActiveGame>().joinButton.SetActive(true);
         }
     }
 

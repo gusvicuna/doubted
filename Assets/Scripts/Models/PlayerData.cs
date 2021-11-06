@@ -15,12 +15,17 @@ public class PlayerData
     public int turnNumber;
     public string name;
     public bool acceptationState;
-    public List<pinta> dice;
+    public List<int> dados;
+    public int dado1;
+    public int dado2;
+    public int dado3;
+    public int dado4;
+    public int dado5;
     public bool haObligado;
     public PredictionData lastPrediction;
 
     public PlayerData() {
-        dice = new List<pinta>();
+        dados = new List<int>();
         lastPrediction = new PredictionData();
     }
 

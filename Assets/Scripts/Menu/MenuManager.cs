@@ -94,9 +94,20 @@ public class MenuManager : MonoBehaviour
                 gameData.gameName = game["gameName"];
                 gameData.playerTurn = game["playerTurn"];
                 gameData.maxPlayers = game["maxPlayers"];
-                currentUserData.games.Add(gameData);
+
+                StartCoroutine(onlineManager.GetPlayers(gameData.id.ToString(), result =>
+                {
+                    foreach (SimpleJSON.JSONNode playerDataJson in result)
+                    {
+                        PlayerData player = new PlayerData();
+                        player.acceptationState = playerDataJson["acceptationState"];
+                        player.name = playerDataJson["name"];
+                        gameData.players.Add(player);
+                    }
+                    currentUserData.games.Add(gameData);
+                    mainMenu.UpdateGames();
+                }));
             }
-            mainMenu.UpdateGames();
         }));
     }
     public void UpdateFriends() {

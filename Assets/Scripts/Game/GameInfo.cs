@@ -37,7 +37,7 @@ public class GameInfo : MonoBehaviour
         diceTotalText.text = diceTotal.ToString();
     }
 
-    public void SetPlayers(List<PlayerData> players, int playerTurn)
+    public void SetPlayersInfo(List<PlayerData> players, int playerTurn)
     {
         foreach (Transform child in PlayersInfoPanel.transform)
         {
@@ -47,8 +47,9 @@ public class GameInfo : MonoBehaviour
         {
             GameObject playerInfoPanel = Instantiate(playerInfoPrefab, PlayersInfoPanel.transform);
             if(playerData.turnNumber==playerTurn) playerInfoPanel.GetComponent<Image>().color = Color.green;
+            else playerInfoPanel.GetComponent<Image>().color = Color.white;
             playerInfoPanel.transform.Find("PlayerName Text").GetComponent<Text>().text = playerData.name;
-            playerInfoPanel.transform.Find("NumberDice Text").GetComponent<Text>().text = playerData.dice.Count.ToString();
+            playerInfoPanel.transform.Find("NumberDice Text").GetComponent<Text>().text = playerData.dados.Count.ToString();
             if (playerData.lastPrediction != null)
             {
                 if (playerData.lastPrediction.type == "prediction") {
