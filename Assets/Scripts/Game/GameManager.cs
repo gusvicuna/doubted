@@ -70,8 +70,7 @@ namespace Assets.Scripts.Game
 
             UploadToDB();
 
-            SetPlayerDice();
-            SetGameInfo();
+            DownloadFromDB();
         }
 
         public void DoubtAction()
@@ -284,7 +283,6 @@ namespace Assets.Scripts.Game
             }
             
             if (_currentGameData.newRound) _currentGameData.newRound = false;
-            DownloadFromDB();
 
         }
 
