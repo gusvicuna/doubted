@@ -16,6 +16,7 @@ public class MenuManager : MonoBehaviour
     [Header("Panels:")] 
     public MainMenu mainMenu;
     public Login loginMenu;
+    public GameObject statisticPanel;
 
     [HideInInspector]
     public bool updating = false;
@@ -141,6 +142,12 @@ public class MenuManager : MonoBehaviour
                 currentUserData.friendsInvited.Add(friendData);
             }
         }));
+    }
+
+    public void UpdateStatistics()
+    {
+        statisticPanel.SetActive(true);
+        statisticPanel.GetComponent<Statistics>().userData = currentUserData;
     }
 
     public void UpdateGameNotifications() {
