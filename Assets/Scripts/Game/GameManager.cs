@@ -119,6 +119,7 @@ namespace Assets.Scripts.Game
             UploadToDB();
 
             updating = true;
+            
             roundFinishedText.gameObject.SetActive(false);
             DownloadFromDB();
         }
@@ -237,7 +238,6 @@ namespace Assets.Scripts.Game
                 if (_currentGameData.playerTurn == _currentPlayerData.turnNumber) {
                     Debug.Log("Perdí");
 
-                    updating = false;
                     turnPanel.SetActive(true);
                     turnPanel.transform.Find("Doubt Button").gameObject.SetActive(false);
                     turnPanel.transform.Find("Calzar Button").gameObject.SetActive(false);
@@ -284,7 +284,7 @@ namespace Assets.Scripts.Game
             }
             
             if (_currentGameData.newRound) _currentGameData.newRound = false;
-
+            DownloadFromDB();
 
         }
 
