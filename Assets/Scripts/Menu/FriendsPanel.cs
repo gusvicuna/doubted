@@ -86,6 +86,7 @@ public class FriendsPanel : MonoBehaviour
                     userSearched.username = usernameInputField.text;
                     friendSearchText.text = userSearched.username;
                     addFriendButton.gameObject.SetActive(true);
+                    friendSearchText.gameObject.SetActive(true);
                 }
             }
             else {

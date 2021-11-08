@@ -151,6 +151,8 @@ public class MenuManager : MonoBehaviour
                 playerData.gameId = player["gameId"];
                 playerData.userId = player["userId"];
                 playerData.id = player["id"];
+                playerData.name = player["name"];
+                playerData.turnNumber = player["turnNumber"];
                 currentUserData.gamesInvited.Add(playerData);
             }
         }));

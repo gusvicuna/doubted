@@ -46,6 +46,7 @@ public class Notifications : MonoBehaviour
         }
         foreach (PlayerData player in _menuManager.currentUserData.gamesInvited) {
             GameObject gameInvitation = Instantiate(gameNotificationPrefab, gameNotificationsPanel.transform);
+            Debug.Log(player.Stringify());
             gameInvitation.GetComponent<GameNotification>().playerData = player;
             gameInvitation.GetComponent<GameNotification>().gameIdText.text = player.gameId.ToString();
         }

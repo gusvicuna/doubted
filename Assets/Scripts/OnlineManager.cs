@@ -321,7 +321,6 @@ public class OnlineManager : MonoBehaviour
     }
 
     public IEnumerator GetGame(string game_id, System.Action<JSONNode> callback = null) {
-        Debug.Log(game_id);
         using UnityWebRequest request = UnityWebRequest.Get(_apiPath + "/games/" + game_id);
         yield return request.SendWebRequest();
         if (request.result == UnityWebRequest.Result.ProtocolError) {

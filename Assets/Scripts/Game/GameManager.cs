@@ -17,8 +17,8 @@ namespace Assets.Scripts.Game
         public PlayerDice currentPlayerDice;
         public List<PlayerDice> playersDice;
         public GameObject turnPanel;
-        public Text winText;
-        public Text loseText;
+        public Text roundFinishedText;
+        public Text gameFinishedText;
 
         [Header("Update Settings")]
         public bool updating = true;
@@ -50,7 +50,7 @@ namespace Assets.Scripts.Game
             _currentGameData.id = PlayerPrefs.GetInt("currentGameId");
             _currentUserData.id = PlayerPrefs.GetInt("currentPlayerId");
 
-            UpdateData();
+            DownloadFromDB();
 
         }
 
@@ -82,85 +82,95 @@ namespace Assets.Scripts.Game
             PredictionData predictionData = new PredictionData();
             predictionData.type = "doubt";
             _currentPlayerData.lastPrediction = predictionData;
+            _currentPlayerData.lastPType = "doubt";
 
             ShowAllDice();
 
-            yield return new WaitForSeconds(8);
 
             int lastTurn = _currentPlayerData.turnNumber - 1;
             PlayerData lastPlayerData;
             while (true) {
-                if (lastTurn <= 0) lastTurn = _currentGameData.maxPlayers;
+                if (lastTurn < 0) lastTurn = _currentGameData.maxPlayers - 1;
                 lastPlayerData = _currentGameData.players.Find(p => p.turnNumber == lastTurn);
                 if (lastPlayerData.dados.Count > 0) break;
+                lastTurn -= 1;
             }
-
+            Debug.Log("Last player: " + lastPlayerData.Stringify());
             int trueQuantity = 0;
             foreach (var playerData in _currentGameData.players) {
                 foreach (var playerDataDie in playerData.dados) {
-                    if (playerDataDie.Equals(lastPlayerData.lastPrediction.number) || playerDataDie.Equals(pinta.As))
+                    if (playerDataDie.Equals((int)lastPlayerData.lastPrediction.number) || playerDataDie.Equals(1))
                         trueQuantity += 1;
                 }
             }
-            Debug.Log(trueQuantity);
+            Debug.Log("True quantity: " + trueQuantity);
 
-            if (trueQuantity >= lastPlayerData.lastPrediction.quantity)
-            {
+            if (trueQuantity >= lastPlayerData.lastPrediction.quantity) {
                 _currentUserData.dudasIncorrectas += 1;
                 LoseRound(_currentPlayerData);
             }
-            else
-            {
+            else {
                 _currentUserData.dudasCorrectas += 1;
                 LoseRound(lastPlayerData);
             }
-            LoseRound(trueQuantity >= lastPlayerData.lastPrediction.quantity ? _currentPlayerData : lastPlayerData);
+
+            yield return new WaitForSeconds(8);
 
             UploadToDB();
 
-            SetPlayerDice();
-            SetGameInfo();
+            updating = true;
+            roundFinishedText.gameObject.SetActive(false);
+            DownloadFromDB();
         }
 
-        public void Calzar() {
+        public void CalzarAction()
+        {
+            StartCoroutine(Calzar());
+        }
+
+        public IEnumerator Calzar()
+        {
             PredictionData predictionData = new PredictionData();
             predictionData.type = "calzar";
             _currentPlayerData.lastPrediction = predictionData;
+            _currentPlayerData.lastPType = "calzar";
 
             ShowAllDice();
 
             int lastTurn = _currentPlayerData.turnNumber - 1;
             PlayerData lastPlayerData;
             while (true) {
-                if (lastTurn <= 0) lastTurn = _currentGameData.maxPlayers;
+                if (lastTurn < 0) lastTurn = _currentGameData.maxPlayers - 1;
                 lastPlayerData = _currentGameData.players.Find(p => p.turnNumber == lastTurn);
                 if (lastPlayerData.dados.Count > 0) break;
+                lastTurn -= 1;
             }
 
             int trueQuantity = 0;
             foreach (var playerData in _currentGameData.players) {
                 foreach (var playerDataDie in playerData.dados) {
-                    if (playerDataDie.Equals(lastPlayerData.lastPrediction.number) || playerDataDie.Equals(pinta.As))
+                    if (playerDataDie.Equals((int)lastPlayerData.lastPrediction.number) || playerDataDie.Equals(1))
                         trueQuantity += 1;
                 }
             }
             Debug.Log(trueQuantity);
 
-            if (trueQuantity == lastPlayerData.lastPrediction.quantity)
-            {
+            if (trueQuantity == lastPlayerData.lastPrediction.quantity) {
                 _currentUserData.calzadasCorrectas += 1;
                 WinRound();
             }
-            else
-            {
+            else {
                 _currentUserData.calzadasIncorrectas += 1;
                 LoseRound(_currentPlayerData);
             }
 
+            yield return new WaitForSeconds(8);
+
             UploadToDB();
 
-            SetPlayerDice();
-            SetGameInfo();
+            updating = true;
+            roundFinishedText.gameObject.SetActive(false);
+            DownloadFromDB();
         }
 
         #endregion
@@ -179,21 +189,33 @@ namespace Assets.Scripts.Game
             gameInfo.SetPlayersInfo(_currentGameData.players, _currentGameData.playerTurn);
         }
 
-        private void SetPlayerDice() {
+        private void SetPlayerDice()
+        {
+            _currentGameData.players.Remove(_currentPlayerData);
+
             for (int i = 0; i < _currentGameData.players.Count; i++) {
                 playersDice[i].SetDice(_currentGameData.players[i], false);
             }
             currentPlayerDice.SetDice(_currentPlayerData, true);
+
+            _currentGameData.players.Add(_currentPlayerData);
         }
 
-        public void ShowAllDice() {
+        public void ShowAllDice()
+        {
+            _currentGameData.players.Remove(_currentPlayerData);
             for (int i = 0; i < _currentGameData.players.Count; i++) {
                 playersDice[i].SetDice(_currentGameData.players[i], true);
             }
+            _currentGameData.players.Add(_currentPlayerData);
         }
 
         #endregion
-        private void WinRound() {
+        private void WinRound()
+        {
+            roundFinishedText.gameObject.SetActive(true);
+            roundFinishedText.text = _currentPlayerData.name + " wins the round!";
+
             if (_currentPlayerData.dados.Count < 5) _currentPlayerData.dados.Add(1);
 
             _currentGameData.playerTurn = _currentPlayerData.turnNumber;
@@ -201,10 +223,26 @@ namespace Assets.Scripts.Game
             NewRound();
         }
 
-        private void LoseRound(PlayerData playerData) {
+        private void LoseRound(PlayerData playerData)
+        {
             playerData.dados.RemoveAt(0);
-            Debug.Log(playerData.dados.Count);
-            _currentGameData.playerTurn = playerData.turnNumber;
+
+            roundFinishedText.gameObject.SetActive(true);
+            roundFinishedText.text = playerData.name + " loses a die!";
+
+            if(playerData.dados.Count==0) NextTurn();
+            else
+            {
+                _currentGameData.playerTurn = playerData.turnNumber;
+                if (_currentGameData.playerTurn == _currentPlayerData.turnNumber) {
+                    Debug.Log("Perdí");
+
+                    updating = false;
+                    turnPanel.SetActive(true);
+                    turnPanel.transform.Find("Doubt Button").gameObject.SetActive(false);
+                    turnPanel.transform.Find("Calzar Button").gameObject.SetActive(false);
+                }
+            }
 
             NewRound();
         }
@@ -212,7 +250,7 @@ namespace Assets.Scripts.Game
         private void NewRound() {
             foreach (var playerData in _currentGameData.players)
             {
-                playerData.lastPrediction = null;
+                playerData.lastPrediction = new PredictionData();
                 int numberDice = playerData.dados.Count;
                 playerData.dados = new List<int>();
                 for (int i = 0; i < numberDice; i++) {
@@ -221,15 +259,33 @@ namespace Assets.Scripts.Game
                 }
             }
 
+            _currentGameData.newRound = true;
             _currentGameData.round++;
         }
 
         private void NextTurn()
         {
             updating = true;
-            _currentGameData.playerTurn += 1;
-            if(_currentGameData.players[_currentGameData.playerTurn].dados.Count == 0) NextTurn();
-            if (_currentGameData.playerTurn >= _currentGameData.players.Count) _currentGameData.playerTurn = 0;
+            int thisTurn = _currentGameData.playerTurn;
+            while (true)
+            {
+                _currentGameData.playerTurn += 1;
+                Debug.Log("Players count: " + _currentGameData.players.Count);
+                if (_currentGameData.playerTurn >= _currentGameData.players.Count) _currentGameData.playerTurn = 0;
+
+                Debug.Log("Player turn: " + _currentGameData.playerTurn);
+                //Check if player lost
+                if (_currentGameData.players.Find(p => p.turnNumber == _currentGameData.playerTurn).dados.Count > 0) break;
+                if (_currentGameData.playerTurn == thisTurn)
+                {
+                    _currentGameData.gameFinished = true;
+                    break;
+                }
+            }
+            
+            if (_currentGameData.newRound) _currentGameData.newRound = false;
+
+
         }
 
         public void LoadMainMenu()
@@ -254,7 +310,8 @@ namespace Assets.Scripts.Game
 
                 yield return new WaitForSeconds(1);
 
-                StartCoroutine(_onlineManager.GetGame(_currentGameData.id.ToString(), result => {
+                StartCoroutine(_onlineManager.GetGame(PlayerPrefs.GetInt("currentGameId").ToString(), result => {
+                    _currentGameData.id = PlayerPrefs.GetInt("currentGameId");
                     _currentGameData.gameName = result["gameName"];
                     _currentGameData.password = result["passWord"];
                     _currentGameData.maxPlayers = result["maxPlayers"];
@@ -295,6 +352,8 @@ namespace Assets.Scripts.Game
                         newPredictionData.number = (pinta)(int)playerJson["lastPPinta"];
                         playerData.lastPrediction = newPredictionData;
 
+
+
                         if (playerJson["userId"] == _currentUserData.id)
                         {
                             _currentPlayerData = playerData;
@@ -316,24 +375,47 @@ namespace Assets.Scripts.Game
                 SetGameInfo();
                 SetPlayerDice();
 
+                gameFinishedText.text = "";
                 if (_currentGameData.gameFinished) {
                     if (_currentPlayerData.dados.Count > 0) {
-                        winText.gameObject.SetActive(true);
+                        gameFinishedText.gameObject.SetActive(true);
+                        gameFinishedText.text = "You Win!";
+                        gameFinishedText.color = Color.blue;
+                        _currentUserData.wins += 1;
                         updating = false;
                     }
                     else {
-                        loseText.gameObject.SetActive(true);
+                        gameFinishedText.gameObject.SetActive(true);
+                        gameFinishedText.text = "You Lose!";
+                        gameFinishedText.color = Color.red;
+                        _currentUserData.loses += 1;
                         updating = false;
                     }
                 }
                 if (_currentGameData.playerTurn == _currentPlayerData.turnNumber) {
-                    updating = false;
-                    turnPanel.SetActive(true);
-                    if (_currentGameData.newRound) {
-                        turnPanel.transform.Find("Doubt Button").gameObject.SetActive(false);
-                        turnPanel.transform.Find("Calzar Button").gameObject.SetActive(false);
+                    if (_currentPlayerData.dados.Count == 0)
+                    {
+                        NextTurn();
+                        UploadToDB();
                     }
-                    if (!_currentGameData.canCalzar) turnPanel.transform.Find("Calzar Button").gameObject.SetActive(false);
+                    else
+                    {
+                        updating = false;
+                        turnPanel.SetActive(true);
+                        if (_currentGameData.newRound) {
+                            turnPanel.transform.Find("Doubt Button").gameObject.SetActive(false);
+                            turnPanel.transform.Find("Calzar Button").gameObject.SetActive(false);
+                        }
+                        else {
+                            turnPanel.transform.Find("Doubt Button").gameObject.SetActive(true);
+                            turnPanel.transform.Find("Calzar Button").gameObject.SetActive(true);
+                        }
+                        if (!_currentGameData.canCalzar) turnPanel.transform.Find("Calzar Button").gameObject.SetActive(false);
+                    }
+                }
+                else
+                {
+                    turnPanel.SetActive(false);
                 }
 
 
@@ -354,11 +436,15 @@ namespace Assets.Scripts.Game
                 else playerData.dado4 = -1;
                 if (playerData.dados.Count >= 5) playerData.dado5 = playerData.dados[4];
                 else playerData.dado5 = -1;
+                playerData.lastPType = playerData.lastPrediction.type;
+                playerData.lastPQuantity = playerData.lastPrediction.quantity;
+                playerData.lastPPinta = (int)playerData.lastPrediction.number;
+
                 StartCoroutine(_onlineManager.PutPlayer(playerData.id.ToString(), playerData.Stringify()));
             }
             StartCoroutine(_onlineManager.PutUser(_currentUserData.id.ToString(), _currentUserData.Stringify()));
         }
-        public void UpdateData() {
+        public void DownloadFromDB() {
             StartCoroutine(UpdateDataCoroutine());
         }
 

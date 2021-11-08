@@ -22,7 +22,11 @@ public class PlayerData
     public int dado4;
     public int dado5;
     public bool haObligado;
+
     public PredictionData lastPrediction;
+    public string lastPType;
+    public int lastPQuantity;
+    public int lastPPinta;
 
     public PlayerData() {
         dados = new List<int>();

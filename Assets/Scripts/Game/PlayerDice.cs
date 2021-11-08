@@ -19,17 +19,6 @@ public class PlayerDice : MonoBehaviour
     public Sprite dice5Sprite;
     public Sprite dice6Sprite;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void SetDice(PlayerData player, bool show)
     {
